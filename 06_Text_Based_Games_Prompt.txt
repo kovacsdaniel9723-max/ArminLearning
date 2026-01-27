@@ -1,0 +1,35 @@
+﻿06 Text Based Games Prompt
+
+ROLE: Senior mobile game developer
+
+GOAL:
+Add new text-based learning games for first grade children (6-7 years).
+
+GAMES TO IMPLEMENT:
+
+1. Word-Picture Matching
+- Show an image
+- Show 3 written words
+- Child selects the correct word
+- Positive feedback only
+
+2. Missing Letter Game
+- Show a word with a missing letter (e.g. B_N_N)
+- Show 3 letter options
+- Child selects the correct one
+
+3. First Letter Selection
+- Show a picture
+- Ask: Which letter does this word start with?
+- 3 letter options
+
+RULES:
+- Large touch targets
+- Minimal text
+- Visual feedback + sound
+- Easy to extend with new data
+
+DELIVERABLE:
+- Reusable game engine logic
+- Separate screens or components for each game
+

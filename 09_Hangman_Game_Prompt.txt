@@ -1,0 +1,137 @@
+TE EGY SENIOR REACT NATIVE + EXPO FEJLESZTŐ VAGY.
+EGY 1. OSZTÁLYOS GYEREKEKNEK KÉSZÜLŐ TANULÓ APPBA KELL
+EGY TELJES, GYEREKBARÁT "AKASZTÓFA" JÁTÉKOT IMPLEMENTÁLNOD.
+
+FONTOS:
+- NEM LEHET ERŐSZAKOS
+- NINCS AKASZTÁS
+- POZITÍV, BÁTORÍTÓ UX
+- ANDROID-FIRST
+- EXPO + TYPESCRIPT
+- MEGLÉVŐ ARCHITEKTÚRÁBA ILLESZKEDJEN
+
+--------------------------------------------------
+JÁTÉK NEVE:
+"Építsük meg a robotot!"
+
+--------------------------------------------------
+ALAPELV:
+A klasszikus akasztófa helyett
+EGY ROBOT ÉPÜL FEL LÉPÉSRŐL LÉPÉSRE.
+
+HIBÁNÁL:
+- egy új robot alkatrész jelenik meg
+- nincs negatív visszajelzés
+- max 5 hiba
+- a robot végül mindig elkészül
+
+--------------------------------------------------
+JÁTÉKSZABÁLYOK:
+- 1 szó (3–6 betű)
+- magyar, egyszerű szavak
+- a szó betűi _ karakterekkel jelennek meg
+- a gyerek betűket választ gombokkal
+- helyes betű → azonnal megjelenik
+- hibás betű → robot alkatrész hozzáadása
+- maxWrong = 5
+- segítség gomb: 1 betű felfedése
+
+--------------------------------------------------
+UI ELEMEK:
+- Szó megjelenítés: "_ A _ _ A"
+- Betűválasztó gomb grid (nagy, színes)
+- Visszajelzés animáció:
+  - helyes: csillag, robot hang
+  - nyerés: konfetti + szó felolvasása
+- Segítség gomb
+- Új játék gomb
+
+--------------------------------------------------
+VIZUÁLIS MEGOLDÁS:
+Robot építési lépések:
+1. test
+2. fej
+3. bal kar
+4. jobb kar
+5. lábak
+
+MINDEN LÉPÉS EGY KOMPONENS LEGYEN
+
+--------------------------------------------------
+ADATFORRÁS:
+HASZNÁLD A KÖVETKEZŐ WORD LISTÁT:
+
+export const HANGMAN_WORDS = [
+  "NAP",
+  "HÓ",
+  "LÓ",
+  "HAL",
+  "ALMA",
+  "BÉKA",
+  "CICA",
+  "KÉZ",
+  "HÁZ",
+  "LABDA",
+  "KUTYA",
+  "MEDVE",
+  "MACSKA",
+  "ZEBRA",
+  "ANGYAL",
+  "PÁRNA",
+  "TÁNYÉR",
+  "ZSÁK"
+];
+
+--------------------------------------------------
+KÓDSTRUKTÚRA (KÖTELEZŐ):
+
+src/
+ └── games/
+     └── hangman/
+         ├── HangmanGameScreen.tsx
+         ├── HangmanLogic.ts
+         ├── HangmanWordData.ts
+         ├── RobotProgress.tsx
+         └── types.ts
+
+--------------------------------------------------
+LOGIKA ELVÁRÁSOK:
+
+type HangmanState = {
+  word: string;
+  guessedLetters: string[];
+  wrongGuesses: number;
+  maxWrong: number;
+};
+
+FUNKCIÓK:
+- startNewGame()
+- guessLetter(letter: string)
+- isWin()
+- isGameOver()
+- revealHintLetter()
+
+--------------------------------------------------
+EXTRA (HA KÖNNYŰ):
+- betűk kimondása gombnyomáskor
+- robot hang effektek
+- szó felolvasása nyerésnél
+- stat mentés AsyncStorage-be
+
+--------------------------------------------------
+STÍLUS:
+- gyerekbarát
+- nagy betűk
+- élénk színek
+- NINCS PIROS / HIBA HANG
+
+--------------------------------------------------
+VÉGÜL:
+ÍRD MEG A TELJES IMPLEMENTÁCIÓT:
+- KOMPONENSEK
+- LOGIKA
+- TÍPUSOK
+- EXPORTOK
+
+A KÓD LEGALÁBB MVP SZINTEN MŰKÖDJÖN.
+NE MAGYARÁZZ, CSAK A KÓDOT ADD.

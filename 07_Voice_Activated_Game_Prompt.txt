@@ -1,0 +1,39 @@
+﻿07 Voice Activated Game Prompt
+
+ROLE: Mobile developer specialized in child-friendly audio UX
+
+GOAL:
+Implement a voice-activated (non-recognition) speaking game.
+
+GAME:
+'Say it out loud!'
+
+FLOW:
+1. App shows a letter or word
+2. App says it out loud
+3. Child is asked to repeat it
+4. App listens for sound input
+5. If sound level + duration is sufficient → success
+
+IMPORTANT:
+- DO NOT analyze spoken content
+- Only detect:
+  - microphone permission
+  - sound volume
+  - recording duration
+
+UX RULES:
+- Always positive feedback
+- No 'wrong answer'
+- Encourage retry
+
+TECH:
+- Expo
+- expo-av
+- Microphone permission handling
+
+DELIVERABLE:
+- VoiceGameScreen
+- Audio utility helper
+- Clear comments explaining logic
+

@@ -1,0 +1,295 @@
+1) BETŰK (Magyar ABC – 44 betű, ékezetekkel)
+A
+Á
+B
+C
+D
+E
+É
+F
+G
+H
+I
+Í
+J
+K
+L
+M
+N
+O
+Ó
+Ö
+Ő
+P
+R
+S
+T
+U
+Ú
+Ü
+Ű
+V
+Z
+
+------------------------------------------------------------
+2) SZAVAK (1. osztályos, ~100 szó)
+A lista **csak a szavakat tartalmazza**, nagybetűvel. A képekhez később a fájlnevek legyenek a szóval megegyezők (pl. ALMA.png), és az assets/images/words mappába kerüljenek.
+
+1. ALMA
+2. ANGYAL
+3. APÁC
+4. APÓ
+5. ÁGY
+6. ÁLLAT
+7. ÁR
+8. ÁRNYÉK
+9. ÁRPA
+10. ÁRVA
+11. BABA
+12. BÁR
+13. BÁTOR
+14. BÉKA
+15. BÉR
+16. BÉLYEG
+17. BICIKLI
+18. BIKA
+19. BILI
+20. BOGÁR
+21. BOLT
+22. BOR
+23. BOT
+24. CICA
+25. CUKOR
+26. CSIGA
+27. CSOKI
+28. DADA
+29. DALLAM
+30. DARU
+31. DÉLI
+32. DÍSZ
+33. DOLGOZÓ
+34. DONGÓ
+35. ELEM
+36. ÉBRED
+37. ÉG
+38. ÉLELEM
+39. ÉNEK
+40. ÉR
+41. ERDŐ
+42. ESKÜ
+43. ÉS
+44. ÉTKEZIK
+45. FAKÓ
+46. FÁK
+47. FAL
+48. FARKAS
+49. FÉL
+50. FÉNY
+51. FIÚ
+52. FŰ
+53. GÉP
+54. GOLYÓ
+55. GYERTYA
+56. GYÖNGY
+57. HÁZ
+58. HAL
+59. HANG
+60. HÉT
+61. HÍD
+62. HÓ
+63. IGAZ
+64. ILLAT
+65. IMA
+66. ÍR
+67. JÁR
+68. JÉG
+69. JÓ
+70. KAKAS
+71. KÉP
+72. KERT
+73. KÉZ
+74. KIS
+75. KÖR
+76. KÖZ
+77. KUKA
+78. KULCS
+79. KUTYA
+80. LABDA
+81. LÁB
+82. LÉP
+83. LÓ
+84. LÓCA
+85. MÁR
+86. MACSKA
+87. MEDVE
+88. MÉH
+89. MÉZ
+90. MŰ
+91. NAP
+92. NÉZ
+93. NYÁR
+94. NYÚL
+95. ÓRA
+96. ÖKÖR
+97. ŐZ
+98. PÁRNA
+99. PÉNZ
+100. PILLANGÓ
+101. RÁK
+102. RÉT
+103. SÁR
+104. SÁTOR
+105. SIKER
+106. SZÁR
+107. SZÉL
+108. SZÍN
+109. SZÓ
+110. TÁNYÉR
+111. TÉR
+112. TOLL
+113. TŰZ
+114. TÜKÖR
+115. TÜCSÖK
+116. UJJ
+117. ÚT
+118. ÜVEG
+119. ÜZLET
+120. VÁR
+121. VÍZ
+122. ZÁSZLÓ
+123. ZEBRA
+124. ZENE
+125. ZSÁK
+
+------------------------------------------------------------
+3) ADATSTRUKTÚRA (TypeScript / Cursor kompatibilis)
+
+A) letterData.ts (betűk)
+--------------------------------
+export type LetterItem = {
+  id: string;
+  letter: string;
+  image?: any;
+  sound?: any;
+};
+
+export const LETTERS: LetterItem[] = [
+  // Példa:
+  // { id: "a", letter: "A", image: require("../assets/images/letters/A.png"), sound: require("../assets/sounds/letters/A.mp3") }
+];
+
+Használat:
+- a script generálja majd a listát a assets/images/letters mappából
+- id: kisbetűs, ékezet nélküli (pl. "a", "á", "ő")
+
+--------------------------------
+B) wordData.ts (szavak)
+--------------------------------
+export type WordItem = {
+  id: string;
+  word: string;
+  image: any;
+  sound?: any;
+  firstLetter: string;
+};
+
+export const WORDS: WordItem[] = [
+  // Példa:
+  // { id: "alma", word: "ALMA", image: require("../assets/images/words/ALMA.png"), sound: require("../assets/sounds/words/ALMA.mp3"), firstLetter: "A" }
+];
+
+Használat:
+- id: kisbetűs, ékezetes szó (pl. "álma")
+- firstLetter: a szó első betűje (nagybetűs, ékezetes)
+
+--------------------------------
+C) textGameData.ts (szövegalapú játékok)
+--------------------------------
+export const WORD_PICTURE_PAIRS = WORDS; // szó-kép párosítás: minden szó egy pár
+
+export const MISSING_LETTER_WORDS = [
+  // { id: "beka", wordPattern: "B_A", answer: "E", image: require("../assets/images/words/BEKA.png") }
+];
+
+export const FIRST_LETTER_WORDS = WORDS.map(w => ({
+  id: w.id,
+  word: w.word,
+  image: w.image,
+  firstLetter: w.firstLetter
+}));
+
+--------------------------------
+D) voiceGameData.ts (hangjáték)
+--------------------------------
+export type VoiceItem = {
+  id: string;
+  letter: string;
+  prompt: string;
+  sound?: any;
+};
+
+export const VOICE_LETTERS: VoiceItem[] = [
+  // Példa:
+  // { id: "b", letter: "B", prompt: "Mondd ki a B betűt!", sound: require("../assets/sounds/letters/B.mp3") }
+];
+
+------------------------------------------------------------
+4) FILE NAME RULES (FONTOS)
+- Minden kép fájlnév legyen a szóval azonos, nagybetűs:
+  ALMA.png
+  CICA.png
+  BÉKA.png
+- A hangfájlok ugyanígy:
+  ALMA.mp3
+  CICA.mp3
+
+Ez biztosítja, hogy a generátor script automatikusan működjön.
+
+------------------------------------------------------------
+5) SCRIPT GENERÁLÓ (javasolt workflow)
+1) Töltsd fel az assets/images/words mappába a képeket a fenti szavakkal.
+2) Futtasd:
+   npm run generate-data
+3) A script létrehozza:
+   - src/data/wordData.ts
+   - src/data/letterData.ts
+
+------------------------------------------------------------
+6) JÁTÉKOK SZERINTI BŐVÍTÉS (quick checklist)
+- Betűjáték: bővítsd a LETTERS listát (44 betű)
+- Számjáték: 1–20 fix, nincs további adat
+- Szó-kép: WORDS listából jön
+- Hiányzó betű: készíts 20–30 wordPattern példát (pl. B_A, C_C_A)
+- Kezdőbetű: WORDS listából jön
+- Hangjáték: VOICE_LETTERS listából jön
+
+------------------------------------------------------------
+7) EXTRA: Hiányzó betű minták (példa 20 db)
+B_A (BÉKA)
+C_C_A (CICA)
+A_L_A (ALMA)
+M_C_S_A (MACSKA)
+P_L_L_A (PILLANGÓ)
+K_T_Y_A (KUTYA)
+H_L (HAL)
+H_Z (HÁZ)
+L_B_D_A (LABDA)
+M_D_V_E (MEDVE)
+T_L (TOLL)
+T_NY_R (TÁNYÉR)
+S_Z (SZÓ)
+S_Z_N (SZÍN)
+S_Z_L (SZÉL)
+Z_S (ZÁSZLÓ)
+Z_E_B_R_A (ZEBRA)
+G_Y_R_T_Y_A (GYERTYA)
+F_A_K (FAKÓ)
+F_R_K (FARKAS)
+
+------------------------------------------------------------
+8) Extra: Szólista CSV formátumban (ha szeretnéd)
+word,firstLetter
+ALMA,A
+BÉKA,B
+CICA,C
+...

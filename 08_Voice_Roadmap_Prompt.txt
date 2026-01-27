@@ -1,0 +1,29 @@
+﻿08 Voice Roadmap Prompt
+
+ROLE: Technical product architect
+
+GOAL:
+Define a clear voice feature roadmap for a children's learning app.
+
+VERSION 1 - Fake Voice Interaction
+- Sound detection only
+- Confidence building
+- No speech recognition
+
+VERSION 2 - Word-Level Recognition
+- Android SpeechRecognizer
+- Recognize full words only
+- Hungarian language
+- Soft failure handling
+
+VERSION 3 - Advanced Pronunciation
+- Phoneme-level recognition
+- Custom ML model
+- Offline capable
+- Not part of MVP
+
+OUTPUT:
+- Technical decision notes
+- Risk assessment
+- When to move to next version
+

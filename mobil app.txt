@@ -1,0 +1,90 @@
+﻿📄 01 - Project Setup & Alap Architektúra PROMPT
+ROLE: Senior mobile developer
+GOAL: Set up an Android-first React Native + Expo project for a children learning app.
+TASKS
+* Initialize Expo project with TypeScript
+* Configure clean folder structure:
+o components/
+o screens/
+o games/
+o utils/
+o assets/
+* Set up React Navigation
+* Ensure Android compatibility
+* Add basic theming (colors, spacing)
+OUTPUT
+* Running Expo Android app
+* Clean, scalable base architecture
+* Well-commented starter code
+
+📄 02 - UI / UX (Gyerekbarát design) PROMPT
+ROLE: UX/UI designer for children (6-7 years old)
+GOAL
+Design a child-friendly UI that is:
+* playful
+* simple
+* safe
+RULES (CRITICAL)
+* Large touch targets
+* Minimal text
+* Friendly, non-vibrating colors
+* Clear visual hierarchy
+* Animations on interaction
+* NO negative feedback (no red X, no "wrong" text)
+DELIVERABLES
+* HomeScreen UI
+* Game selection screen
+* Reusable Button component
+* Typography + color guidelines
+
+📄 03 - Betűfelismerő Játék PROMPT
+ROLE: Game logic developer
+GOAL
+Implement a Letter Recognition Game for first grade children.
+GAME FLOW
+1. Display a large uppercase letter
+2. Show 3 answer options (images or words)
+3. Child selects one option
+LOGIC
+* Correct → animation + sound + score increment
+* Incorrect → gentle feedback, retry allowed
+* No punishment
+TECH REQUIREMENTS
+* Randomized questions
+* Easy to extend data structure
+* Clean, readable logic
+DELIVERABLE
+* Fully working LetterGameScreen
+* Reusable game logic functions
+
+📄 04 - Számfelismerő Játék (Skeleton) PROMPT
+ROLE: Game logic developer
+GOAL
+Create a Number Recognition Game (1-20).
+GAME FLOW
+1. Display a number (e.g. 6)
+2. Show multiple icon groups (quantities)
+3. Child selects the matching quantity
+NOTES
+* Skeleton implementation is acceptable
+* Focus on structure, not polish
+DELIVERABLE
+* NumberGameScreen skeleton
+* Reusable logic for future math games
+
+📄 05 - Szülői Kontroll & Statisztika PROMPT
+ROLE: App architect
+GOAL
+Add basic parent control features.
+FEATURES
+* Daily playtime limit (e.g. 10 minutes)
+* Basic usage statistics:
+o number of games played
+o correct answers
+* PIN-protected Parent Screen (simple, hardcoded)
+* Local storage only (AsyncStorage)
+DELIVERABLE
+* ParentScreen
+* Utility functions for stats tracking
+* Well-commented logic
+

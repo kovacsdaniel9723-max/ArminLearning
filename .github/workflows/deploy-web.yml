@@ -2,12 +2,15 @@ name: Deploy Web to GitHub Pages
 
 on:
   push:
-    branches: [master, main]
+    branches: [main, master]
+    paths-ignore:
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
   contents: write
   pages: write
+  administration: write
 
 concurrency:
   group: pages
@@ -18,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -30,34 +36,53 @@ jobs:
       - name: Export web bundle
         run: npx expo export -p web
 
-      - name: Prepare static site
+      - name: Prepare docs folder for GitHub Pages
         run: |
-          touch dist/.nojekyll
-          # SPA: ismeretlen útvonalak → index.html (Expo web client routing)
-          if [ ! -f dist/404.html ]; then
-            cp dist/index.html dist/404.html
+          rm -rf docs
+          cp -r dist docs
+          touch docs/.nojekyll
+          cp docs/index.html docs/404.html
+
+      - name: Commit and push docs to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if git diff --staged --quiet; then
+            echo "No doc changes to publish"
+          else
+            git commit -m "Deploy web to docs [skip ci]"
+            git push origin HEAD:main
           fi
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
-        id: deploy
+      - name: Enable GitHub Pages (main /docs)
+        uses: actions/github-script@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          force_orphan: true
+          script: |
+            const { owner, repo } = context.repo;
+            const source = { branch: 'main', path: '/docs' };
+            try {
+              await github.rest.repos.createPagesSite({
+                owner,
+                repo,
+                build_type: 'legacy',
+                source,
+              });
+              core.info('GitHub Pages created: main /docs');
+            } catch (error) {
+              if (error.status === 409) {
+                await github.rest.repos.updateInformationAboutPagesSite({
+                  owner,
+                  repo,
+                  build_type: 'legacy',
+                  source,
+                });
+                core.info('GitHub Pages updated: main /docs');
+              } else {
+                core.warning(`Pages API: ${error.message}`);
+                core.warning('Enable manually: Settings → Pages → Deploy from branch → main → /docs');
+              }
+            }
 
-      - name: Configure GitHub Pages (gh-pages branch)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          API="https://api.github.com/repos/${{ github.repository }}/pages"
-          HDR=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GH_TOKEN}" -H "X-GitHub-Api-Version: 2022-11-28")
-          BODY='{"build_type":"legacy","source":{"branch":"gh-pages","path":"/"}}'
-          CODE=$(curl -sS -o /tmp/pages.json -w "%{http_code}" -X POST "${HDR[@]}" "$API" -d "$BODY")
-          echo "POST /pages → HTTP ${CODE}"
-          cat /tmp/pages.json
-          if [ "$CODE" != "201" ] && [ "$CODE" != "200" ]; then
-            curl -sS -X PUT "${HDR[@]}" "$API" -d "$BODY" | tee /tmp/pages_put.json
-          fi
-          echo ""
-          echo "Site URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+      - name: Site URL
+        run: echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"

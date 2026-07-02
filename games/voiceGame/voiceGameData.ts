@@ -66,10 +66,16 @@ export const VOICE_WORDS: VoiceItem[] = [
   { id: "gyertya", letter: "gyertya", prompt: "Mondd ki: gyertya" },
 ];
 
+import { getCurrentGrade } from '../../utils/gradeState';
+import { getRandomGrade2VoiceItem } from '../../content/grade2/voiceData';
+
 /**
- * Véletlenszerű betű vagy szó kiválasztása
+ * Véletlenszerű betű vagy szó kiválasztása (osztályszint szerint)
  */
 export const getRandomVoiceItem = (): VoiceItem => {
+  if (getCurrentGrade() === 2) {
+    return getRandomGrade2VoiceItem();
+  }
   const allItems = [...VOICE_LETTERS, ...VOICE_WORDS];
   const randomIndex = Math.floor(Math.random() * allItems.length);
   return allItems[randomIndex];

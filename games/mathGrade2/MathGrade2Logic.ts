@@ -25,14 +25,14 @@ export function generateMathGrade2Task(): MathGrade2Task {
   const op = pickOp();
 
   if (op === 'add') {
-    const a = 10 + Math.floor(Math.random() * 41);
-    const b = 1 + Math.floor(Math.random() * Math.min(50, 100 - a));
+    const a = 15 + Math.floor(Math.random() * 50);
+    const b = 5 + Math.floor(Math.random() * Math.min(40, 100 - a));
     return { op, a, b, answer: a + b };
   }
 
   if (op === 'subtract') {
-    const a = 20 + Math.floor(Math.random() * 81);
-    const b = 1 + Math.floor(Math.random() * (a - 1));
+    const a = 25 + Math.floor(Math.random() * 75);
+    const b = 5 + Math.floor(Math.random() * Math.min(20, a - 10));
     return { op, a, b, answer: a - b };
   }
 

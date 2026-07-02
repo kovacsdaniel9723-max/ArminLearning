@@ -28,6 +28,8 @@ import { ReadingGameScreen } from './screens/ReadingGameScreen';
 import { SentenceGameScreen } from './screens/SentenceGameScreen';
 import { PatternGameScreen } from './screens/PatternGameScreen';
 import { MathGrade2Screen } from './screens/MathGrade2Screen';
+import { Grade2GameScreen } from './screens/Grade2GameScreen';
+import { getGrade2Game } from './games/grade2/registry';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -68,6 +70,14 @@ function AppNavigator() {
         <Stack.Screen name="SentenceGame" component={SentenceGameScreen} options={{ title: 'Mondatépítés' }} />
         <Stack.Screen name="PatternGame" component={PatternGameScreen} options={{ title: 'Sorozat' }} />
         <Stack.Screen name="MathGrade2Game" component={MathGrade2Screen} options={{ title: 'Matematika' }} />
+        <Stack.Screen
+          name="Grade2Game"
+          component={Grade2GameScreen}
+          options={({ route }) => {
+            const def = getGrade2Game(route.params.gameId);
+            return { title: def?.title ?? 'játék' };
+          }}
+        />
         <Stack.Screen name="Parent" component={ParentScreen} options={{ title: 'Szülői beállítások' }} />
         <Stack.Screen name="Rewards" component={RewardsScreen} options={{ title: 'Haladás' }} />
       </Stack.Navigator>

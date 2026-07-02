@@ -118,7 +118,7 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
       const { isCorrect, newState } = checkAnswer(gameState, soundDetected);
       
       if (isCorrect) {
-        setFeedbackMessage('Nagyszerű! 🎉');
+        setFeedbackMessage('ügyes vagy! 🎉');
         const { leveledUp, newLevel, reward } = await recordCorrectAnswerAndCheckLevelUp();
         if (leveledUp && newLevel != null) {
           setLevelUpLevel(newLevel);
@@ -127,7 +127,7 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
         }
       } else {
         // V1-ben mindig pozitív visszajelzést adunk
-        setFeedbackMessage('Próbáld újra! 💪');
+        setFeedbackMessage('próbáld újra! 💪');
         await recordIncorrectAnswer();
       }
 
@@ -160,7 +160,12 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
 
         {/* Betű vagy szó megjelenítése */}
         <View style={styles.letterContainer}>
-          <Text style={styles.letter}>{gameState.currentLetterOrWord}</Text>
+          <Text style={[
+            styles.letter,
+            gameState.currentLetterOrWord.length > 12 && styles.sentence,
+          ]}>
+            {gameState.currentLetterOrWord}
+          </Text>
         </View>
 
         {/* Instrukciók */}
@@ -217,7 +222,7 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
         <FeedbackAnimation
           visible={showFeedback}
           message={feedbackMessage}
-          type={showFeedback && feedbackMessage.includes('Nagyszerű') ? 'success' : 'encouragement'}
+          type={showFeedback && feedbackMessage.includes('ügyes') ? 'success' : 'encouragement'}
         />
         <LevelUpRocketScreen
           visible={showLevelUp}
@@ -260,6 +265,13 @@ const styles = StyleSheet.create({
   letter: {
     ...typography.gameLetter,
     color: colors.primary,
+    fontSize: undefined,
+  },
+  sentence: {
+    ...typography.gameWord,
+    color: colors.primary,
+    textAlign: 'center',
+    paddingHorizontal: spacing.sm,
   },
   instructionsContainer: {
     alignItems: 'center',

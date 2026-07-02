@@ -79,6 +79,7 @@ export type RootStackParamList = {
   SentenceGame: undefined;
   PatternGame: undefined;
   MathGrade2Game: undefined;
+  Grade2Game: { gameId: string };
   Parent: undefined;
   Rewards: undefined;
 };

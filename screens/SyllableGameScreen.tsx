@@ -3,15 +3,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, typography } from '../theme';
-import { FeedbackAnimation } from '../components/FeedbackAnimation';
+import { View, Text } from 'react-native';
 import { getRandomSyllableTask, type SyllableTask } from '../content/grade2/syllableData';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
-import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
-import { GameScreenTopBar } from '../components/GameScreenTopBar';
+import {
+  ClassicGameLayout,
+  GameHeroBox,
+  GameOptionButton,
+} from '../components/game/ClassicGameLayout';
+import { classicGameStyles as gs } from '../theme/classicGameStyles';
 import type { Reward } from '../rewards/rewards';
 
 export const SyllableGameScreen: React.FC = () => {
@@ -54,30 +55,31 @@ export const SyllableGameScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <GameScreenTopBar />
-      <View style={styles.content}>
-        <Text style={styles.score}>pontszám: {score} / {total}</Text>
-        <Text style={styles.prompt}>bontsd szótagokra:</Text>
-        <Text style={styles.word}>{task.word}</Text>
+    <ClassicGameLayout
+      title="📝 szótagolás"
+      score={score}
+      total={total}
+      showFeedback={showFeedback}
+      feedbackMessage={feedbackMessage}
+      showLevelUp={showLevelUp}
+      levelUpLevel={levelUpLevel}
+      levelUpReward={levelUpReward}
+      onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
+    >
+      <Text style={gs.prompt}>bontsd szótagokra:</Text>
+      <GameHeroBox>
+        <Text style={gs.heroWord}>{task.word}</Text>
+      </GameHeroBox>
+      <View style={gs.optionsList}>
         {task.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => handlePick(i)} disabled={isProcessing}>
-            <Text style={styles.optionText}>{opt.join(' · ')}</Text>
-          </TouchableOpacity>
+          <GameOptionButton
+            key={i}
+            label={opt.join(' · ')}
+            onPress={() => handlePick(i)}
+            disabled={isProcessing}
+          />
         ))}
       </View>
-      <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackMessage.includes('ügyes') ? 'success' : 'encouragement'} />
-      <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }} />
-    </SafeAreaView>
+    </ClassicGameLayout>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, padding: spacing.screenPadding },
-  score: { ...typography.body, color: colors.primary, textAlign: 'center', marginBottom: spacing.md },
-  prompt: { ...typography.h3, color: colors.text, textAlign: 'center' },
-  word: { ...typography.h1, color: colors.primary, textAlign: 'center', marginVertical: spacing.lg },
-  option: { backgroundColor: colors.cardBackground, padding: spacing.md, borderRadius: spacing.cardBorderRadius, marginBottom: spacing.sm, borderWidth: 2, borderColor: colors.primaryLight },
-  optionText: { ...typography.bodyLarge, color: colors.text, textAlign: 'center' },
-});

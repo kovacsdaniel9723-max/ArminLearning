@@ -3,10 +3,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, typography } from '../theme';
-import { FeedbackAnimation } from '../components/FeedbackAnimation';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { colors, typography } from '../theme';
 import {
   initializeMathGrade2,
   checkMathGrade2Answer,
@@ -17,8 +15,8 @@ import {
 } from '../games/mathGrade2/MathGrade2Logic';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
-import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
-import { GameScreenTopBar } from '../components/GameScreenTopBar';
+import { ClassicGameLayout, GameHeroBox } from '../components/game/ClassicGameLayout';
+import { classicGameStyles as gs } from '../theme/classicGameStyles';
 import type { Reward } from '../rewards/rewards';
 
 const APPLE = '🍎';
@@ -27,11 +25,11 @@ function AppleRow({ count }: { count: number }) {
   const shown = Math.min(count, 12);
   const extra = count > 12 ? count - 12 : 0;
   return (
-    <View style={styles.appleRow}>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4, maxWidth: 280 }}>
       {Array.from({ length: shown }, (_, i) => (
-        <Text key={i} style={styles.apple}>{APPLE}</Text>
+        <Text key={i} style={{ fontSize: 32 }}>{APPLE}</Text>
       ))}
-      {extra > 0 && <Text style={styles.more}>+{extra}</Text>}
+      {extra > 0 && <Text style={{ ...typography.body, color: colors.textLight }}>+{extra}</Text>}
     </View>
   );
 }
@@ -39,30 +37,29 @@ function AppleRow({ count }: { count: number }) {
 function TaskVisual({ state }: { state: MathGrade2State }) {
   const t = state.currentTask;
   if (!t) return null;
-
   if (t.op === 'add') {
     return (
-      <View style={styles.visual}>
+      <View style={{ alignItems: 'center' }}>
         <AppleRow count={t.a} />
-        <Text style={styles.opSign}>+</Text>
+        <Text style={gs.heroNumber}>+</Text>
         <AppleRow count={t.b} />
       </View>
     );
   }
   if (t.op === 'subtract') {
     return (
-      <View style={styles.visual}>
+      <View style={{ alignItems: 'center' }}>
         <AppleRow count={t.a} />
-        <Text style={styles.opSign}>−</Text>
+        <Text style={gs.heroNumber}>−</Text>
         <AppleRow count={t.b} />
       </View>
     );
   }
   if (t.op === 'multiply' && t.groups != null && t.perGroup != null) {
     return (
-      <View style={styles.visual}>
+      <View style={{ alignItems: 'center' }}>
         {Array.from({ length: t.groups }, (_, g) => (
-          <View key={g} style={styles.group}>
+          <View key={g} style={{ marginBottom: 8 }}>
             <AppleRow count={t.perGroup!} />
           </View>
         ))}
@@ -71,9 +68,9 @@ function TaskVisual({ state }: { state: MathGrade2State }) {
   }
   if (t.op === 'divide' && t.groups != null && t.perGroup != null) {
     return (
-      <View style={styles.visual}>
+      <View style={{ alignItems: 'center' }}>
         <AppleRow count={t.a} />
-        <Text style={styles.hint}>{t.perGroup} alma / csoport</Text>
+        <Text style={gs.prompt}>{t.perGroup} alma / csoport</Text>
       </View>
     );
   }
@@ -126,48 +123,49 @@ export const MathGrade2Screen: React.FC = () => {
 
   if (!gameState.currentTask) {
     return (
-      <SafeAreaView style={styles.container}>
-        <GameScreenTopBar />
-        <Text style={styles.loading}>betöltés...</Text>
-      </SafeAreaView>
+      <ClassicGameLayout
+        title="🔢 matek"
+        showFeedback={false}
+        feedbackMessage=""
+        showLevelUp={false}
+        levelUpLevel={0}
+        onCloseLevelUp={() => {}}
+      >
+        <View style={gs.center}><Text style={gs.loadingText}>betöltés…</Text></View>
+      </ClassicGameLayout>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <GameScreenTopBar />
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.score}>pontszám: {gameState.score} / {gameState.totalQuestions}</Text>
-        <Text style={styles.question}>{getQuestionText(gameState.currentTask)}</Text>
+    <ClassicGameLayout
+      title="🔢 matek"
+      score={gameState.score}
+      total={gameState.totalQuestions}
+      scroll
+      showFeedback={showFeedback}
+      feedbackMessage={feedbackMessage}
+      showLevelUp={showLevelUp}
+      levelUpLevel={levelUpLevel}
+      levelUpReward={levelUpReward}
+      onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
+    >
+      <Text style={gs.prompt}>{getQuestionText(gameState.currentTask)}</Text>
+      <GameHeroBox>
         <TaskVisual state={gameState} />
-        <View style={styles.keypad}>
-          {options.map((num) => (
-            <TouchableOpacity key={num} style={styles.key} onPress={() => handleAnswer(num)} disabled={isProcessing}>
-              <Text style={styles.keyText}>{num}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
-      <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackMessage.includes('ügyes') ? 'success' : 'encouragement'} />
-      <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }} />
-    </SafeAreaView>
+      </GameHeroBox>
+      <View style={gs.optionsGrid}>
+        {options.map((num) => (
+          <TouchableOpacity
+            key={num}
+            style={[gs.letterGridBtn, { width: 72, height: 64 }, isProcessing && gs.optionBtnDisabled]}
+            onPress={() => handleAnswer(num)}
+            disabled={isProcessing}
+            activeOpacity={0.85}
+          >
+            <Text style={gs.letterGridText}>{num}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ClassicGameLayout>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.screenPadding, paddingBottom: spacing.xxl },
-  loading: { ...typography.h2, textAlign: 'center', marginTop: spacing.xxl },
-  score: { ...typography.body, color: colors.primary, textAlign: 'center', marginBottom: spacing.md },
-  question: { ...typography.h3, color: colors.text, textAlign: 'center', marginBottom: spacing.lg },
-  visual: { alignItems: 'center', marginVertical: spacing.lg },
-  appleRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4, maxWidth: 280 },
-  apple: { fontSize: 32 },
-  more: { ...typography.body, color: colors.textLight, alignSelf: 'center' },
-  opSign: { ...typography.h1, color: colors.primary, marginVertical: spacing.sm },
-  group: { marginBottom: spacing.sm },
-  hint: { ...typography.body, color: colors.textLight, marginTop: spacing.sm },
-  keypad: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.md, marginTop: spacing.xl },
-  key: { width: 72, height: 64, backgroundColor: colors.cardBackground, borderRadius: spacing.cardBorderRadius, borderWidth: 3, borderColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  keyText: { ...typography.gameNumber, fontSize: 24, fontWeight: '700', color: colors.primary, lineHeight: 28 },
-});

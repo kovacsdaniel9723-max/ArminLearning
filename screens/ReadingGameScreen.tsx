@@ -3,15 +3,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, typography } from '../theme';
-import { FeedbackAnimation } from '../components/FeedbackAnimation';
+import { View, Text } from 'react-native';
 import { getRandomReadingTask, type ReadingTask } from '../content/grade2/readingData';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
-import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
-import { GameScreenTopBar } from '../components/GameScreenTopBar';
+import {
+  ClassicGameLayout,
+  GameHeroBox,
+  GameOptionButton,
+} from '../components/game/ClassicGameLayout';
+import { classicGameStyles as gs } from '../theme/classicGameStyles';
 import type { Reward } from '../rewards/rewards';
 
 export const ReadingGameScreen: React.FC = () => {
@@ -54,33 +55,27 @@ export const ReadingGameScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <GameScreenTopBar />
-      <View style={styles.content}>
-        <Text style={styles.score}>pontszám: {score} / {total}</Text>
-        <View style={styles.sentenceBox}>
-          <Text style={styles.sentence}>{task.sentence}</Text>
-        </View>
-        <Text style={styles.question}>{task.question}</Text>
+    <ClassicGameLayout
+      title="📖 olvasás"
+      score={score}
+      total={total}
+      scroll
+      showFeedback={showFeedback}
+      feedbackMessage={feedbackMessage}
+      showLevelUp={showLevelUp}
+      levelUpLevel={levelUpLevel}
+      levelUpReward={levelUpReward}
+      onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
+    >
+      <GameHeroBox>
+        <Text style={[gs.optionText, { fontSize: 18, lineHeight: 28 }]}>{task.sentence}</Text>
+      </GameHeroBox>
+      <Text style={gs.prompt}>{task.question}</Text>
+      <View style={gs.optionsList}>
         {task.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => handlePick(i)} disabled={isProcessing}>
-            <Text style={styles.optionText}>{opt}</Text>
-          </TouchableOpacity>
+          <GameOptionButton key={i} label={opt} onPress={() => handlePick(i)} disabled={isProcessing} />
         ))}
       </View>
-      <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackMessage.includes('ügyes') ? 'success' : 'encouragement'} />
-      <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }} />
-    </SafeAreaView>
+    </ClassicGameLayout>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, padding: spacing.screenPadding },
-  score: { ...typography.body, color: colors.primary, textAlign: 'center', marginBottom: spacing.md },
-  sentenceBox: { backgroundColor: colors.backgroundLight, padding: spacing.lg, borderRadius: spacing.cardBorderRadius, marginBottom: spacing.lg, borderWidth: 2, borderColor: colors.primaryLight },
-  sentence: { ...typography.bodyLarge, color: colors.text, textAlign: 'center', lineHeight: 28 },
-  question: { ...typography.h3, color: colors.text, textAlign: 'center', marginBottom: spacing.lg },
-  option: { backgroundColor: colors.cardBackground, padding: spacing.md, borderRadius: spacing.cardBorderRadius, marginBottom: spacing.sm, borderWidth: 2, borderColor: colors.primaryLight },
-  optionText: { ...typography.body, color: colors.text, textAlign: 'center' },
-});

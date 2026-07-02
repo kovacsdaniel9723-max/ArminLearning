@@ -6,6 +6,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ScrollViewProps } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, typography } from '../../theme';
+import { ScreenBackground } from '../ScreenBackground';
 import { FeedbackAnimation } from '../FeedbackAnimation';
 import { LevelUpRocketScreen } from '../LevelUpRocketScreen';
 import { MovementBreakModal } from './MovementBreakModal';
@@ -54,7 +55,7 @@ export const GameSessionLayout: React.FC<GameSessionLayoutProps> = ({
 }) => {
   const header = (
     <View style={styles.header}>
-      <GameBackButton variant="inline" />
+      <GameBackButton variant="prominent" label="← vissza" />
       {title ? <Text style={styles.title}>{title}</Text> : null}
       <View style={styles.statsRow}>
         <View style={styles.statBadge}>
@@ -80,22 +81,24 @@ export const GameSessionLayout: React.FC<GameSessionLayoutProps> = ({
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {body}
-      <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackType} />
-      <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={onCloseLevelUp} />
-      <MovementBreakModal
-        visible={showMovement}
-        challenge={movementChallenge}
-        onComplete={onMovementComplete}
-        onSkip={onMovementSkip}
-      />
-    </SafeAreaView>
+    <ScreenBackground>
+      <SafeAreaView style={styles.container}>
+        {body}
+        <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackType} />
+        <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={onCloseLevelUp} />
+        <MovementBreakModal
+          visible={showMovement}
+          challenge={movementChallenge}
+          onComplete={onMovementComplete}
+          onSkip={onMovementSkip}
+        />
+      </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   flex: { flex: 1 },
   content: { padding: spacing.screenPadding, paddingBottom: spacing.xxl },
   header: { marginBottom: spacing.md },

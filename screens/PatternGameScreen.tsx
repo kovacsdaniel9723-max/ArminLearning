@@ -3,15 +3,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, spacing, typography } from '../theme';
-import { FeedbackAnimation } from '../components/FeedbackAnimation';
+import { View, Text } from 'react-native';
 import { getRandomPatternTask, type PatternTask } from '../content/grade2/patternData';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
-import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
-import { GameScreenTopBar } from '../components/GameScreenTopBar';
+import {
+  ClassicGameLayout,
+  GameHeroBox,
+  GameOptionButton,
+} from '../components/game/ClassicGameLayout';
+import { classicGameStyles as gs } from '../theme/classicGameStyles';
 import type { Reward } from '../rewards/rewards';
 
 export const PatternGameScreen: React.FC = () => {
@@ -56,30 +57,32 @@ export const PatternGameScreen: React.FC = () => {
   const seqDisplay = [...task.sequence, '?'].join('  ');
 
   return (
-    <SafeAreaView style={styles.container}>
-      <GameScreenTopBar />
-      <View style={styles.content}>
-        <Text style={styles.score}>pontszám: {score} / {total}</Text>
-        <Text style={styles.prompt}>mi jön ezután?</Text>
-        <Text style={styles.sequence}>{seqDisplay}</Text>
+    <ClassicGameLayout
+      title="🔢 sorozat"
+      score={score}
+      total={total}
+      showFeedback={showFeedback}
+      feedbackMessage={feedbackMessage}
+      showLevelUp={showLevelUp}
+      levelUpLevel={levelUpLevel}
+      levelUpReward={levelUpReward}
+      onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
+    >
+      <Text style={gs.prompt}>mi jön ezután?</Text>
+      <GameHeroBox>
+        <Text style={gs.heroNumber}>{seqDisplay}</Text>
+      </GameHeroBox>
+      <View style={gs.optionsGrid}>
         {task.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => handlePick(i)} disabled={isProcessing}>
-            <Text style={styles.optionText}>{String(opt)}</Text>
-          </TouchableOpacity>
+          <GameOptionButton
+            key={i}
+            label={String(opt)}
+            onPress={() => handlePick(i)}
+            disabled={isProcessing}
+            small
+          />
         ))}
       </View>
-      <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackMessage.includes('ügyes') ? 'success' : 'encouragement'} />
-      <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }} />
-    </SafeAreaView>
+    </ClassicGameLayout>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, padding: spacing.screenPadding },
-  score: { ...typography.body, color: colors.primary, textAlign: 'center', marginBottom: spacing.md },
-  prompt: { ...typography.h3, color: colors.text, textAlign: 'center' },
-  sequence: { ...typography.h2, color: colors.primary, textAlign: 'center', marginVertical: spacing.xl },
-  option: { backgroundColor: colors.cardBackground, padding: spacing.md, borderRadius: spacing.cardBorderRadius, marginBottom: spacing.sm, borderWidth: 2, borderColor: colors.primaryLight },
-  optionText: { ...typography.gameNumber, color: colors.text, textAlign: 'center' },
-});

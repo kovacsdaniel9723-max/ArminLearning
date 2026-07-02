@@ -1,24 +1,12 @@
 /**
- * VoiceGameScreen
- * Hangaktivált játék képernyő (V1 - Fake Voice)
- * 
- * FONTOS: Ez a verzió NEM elemezi a beszélt tartalmat.
- * Csak hang detektálást végez (hangerő + időtartam).
+ * VoiceGameScreen – hangaktivált játék (V1 fake voice)
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { colors, spacing, typography } from '../theme';
-import { FeedbackAnimation } from '../components/FeedbackAnimation';
+import { spacing } from '../theme';
 import { Button } from '../components/Button';
 import {
   initializeVoiceGame,
@@ -36,8 +24,11 @@ import {
 import { requestMicrophonePermission, checkMicrophonePermission } from '../utils/permissions';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
-import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
-import { GameScreenTopBar } from '../components/GameScreenTopBar';
+import {
+  ClassicGameLayout,
+  GameHeroBox,
+} from '../components/game/ClassicGameLayout';
+import { classicGameStyles as gs } from '../theme/classicGameStyles';
 import type { Reward } from '../rewards/rewards';
 import { isWeb } from '../utils/platform';
 
@@ -47,36 +38,27 @@ interface VoiceGameScreenProps {
   navigation: VoiceGameScreenNavigationProp;
 }
 
-export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) => {
+export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = () => {
   const [gameState, setGameState] = useState<VoiceGameState>(initializeVoiceGame());
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
-  const [recordingStartTime, setRecordingStartTime] = useState<number | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [levelUpLevel, setLevelUpLevel] = useState(0);
   const [levelUpReward, setLevelUpReward] = useState<Reward | undefined>(undefined);
 
   useEffect(() => {
-    // Játék lejátszásának rögzítése
     recordGamePlayed();
-    
-    // Engedély ellenőrzése
     checkMicrophonePermission().then(setHasPermission);
-    
-    // Cleanup amikor a komponens unmount-ol
-    return () => {
-      cleanupAudio();
-    };
+    return () => { cleanupAudio(); };
   }, []);
 
   const handlePlaySound = async () => {
     try {
       await playLetterOrWord(gameState.currentLetterOrWord);
-    } catch (error) {
-      console.error('Error playing sound:', error);
-      Alert.alert('Hiba', 'Nem sikerült lejátszani a hangot.');
+    } catch {
+      Alert.alert('hiba', 'nem sikerült lejátszani a hangot.');
     }
   };
 
@@ -84,25 +66,19 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
     if (isWeb) {
       setIsProcessing(true);
       setGameState({ ...gameState, isListening: true });
-      setRecordingStartTime(Date.now());
       return;
     }
     if (!hasPermission) {
       const granted = await requestMicrophonePermission();
-      if (!granted) {
-        return;
-      }
+      if (!granted) return;
       setHasPermission(true);
     }
-
     try {
       setIsProcessing(true);
-      setRecordingStartTime(Date.now());
       await startRecording();
       setGameState({ ...gameState, isListening: true });
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      Alert.alert('Hiba', 'Nem sikerült elindítani a felvételt.');
+    } catch {
+      Alert.alert('hiba', 'nem sikerült elindítani a felvételt.');
       setIsProcessing(false);
     }
   };
@@ -117,7 +93,6 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
         soundDetected = checkSoundDetection(status, 0.5);
       }
       const { isCorrect, newState } = checkAnswer(gameState, soundDetected);
-      
       if (isCorrect) {
         setFeedbackMessage('ügyes vagy! 🎉');
         const { leveledUp, newLevel, reward } = await recordCorrectAnswerAndCheckLevelUp();
@@ -127,184 +102,95 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
           setShowLevelUp(true);
         }
       } else {
-        // V1-ben mindig pozitív visszajelzést adunk
         setFeedbackMessage('próbáld újra! 💪');
         await recordIncorrectAnswer();
       }
-
       setShowFeedback(true);
       setGameState(newState);
       setIsProcessing(false);
-      setRecordingStartTime(null);
-
       setTimeout(() => {
         setShowFeedback(false);
         setGameState(loadNextQuestion(newState));
       }, 2000);
-    } catch (error) {
-      console.error('Error stopping recording:', error);
-      Alert.alert('Hiba', 'Nem sikerült leállítani a felvételt.');
+    } catch {
+      Alert.alert('hiba', 'nem sikerült leállítani a felvételt.');
       setIsProcessing(false);
       setGameState({ ...gameState, isListening: false });
     }
   };
 
+  const isLong = gameState.currentLetterOrWord.length > 12;
+
   return (
-    <SafeAreaView style={styles.container}>
-      <GameScreenTopBar />
-      <View style={styles.content}>
-        {/* Pontszám */}
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreText}>
-            Pontszám: {gameState.score} / {gameState.totalQuestions}
-          </Text>
-        </View>
+    <ClassicGameLayout
+      title="🎤 mondj hangosan!"
+      score={gameState.score}
+      total={gameState.totalQuestions}
+      showFeedback={showFeedback}
+      feedbackMessage={feedbackMessage}
+      showLevelUp={showLevelUp}
+      levelUpLevel={levelUpLevel}
+      levelUpReward={levelUpReward}
+      onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
+    >
+      <GameHeroBox>
+        <Text style={isLong ? gs.heroWord : gs.heroLetter}>{gameState.currentLetterOrWord}</Text>
+      </GameHeroBox>
 
-        {/* Betű vagy szó megjelenítése */}
-        <View style={styles.letterContainer}>
-          <Text style={[
-            styles.letter,
-            gameState.currentLetterOrWord.length > 12 && styles.sentence,
-          ]}>
-            {gameState.currentLetterOrWord}
-          </Text>
-        </View>
-
-        {/* Instrukciók */}
-        <View style={styles.instructionsContainer}>
-          <Text style={styles.instructionText}>
-            {gameState.isListening
-              ? '🎤 Mondd ki hangosan!'
-              : 'Kattints a lejátszás gombra, majd ismételd meg!'}
-          </Text>
-        </View>
-
-        {/* Gombok */}
-        <View style={styles.buttonContainer}>
-          <Button
-            title="🔊 Lejátszás"
-            onPress={handlePlaySound}
-            variant="primary"
-            size="large"
-            disabled={isProcessing || gameState.isListening}
-            style={styles.button}
-          />
-
-          {!gameState.isListening ? (
-            <Button
-              title="🎤 Mondd ki!"
-              onPress={handleStartListening}
-              variant="secondary"
-              size="large"
-              disabled={isProcessing || !hasPermission}
-              style={styles.button}
-            />
-          ) : (
-            <Button
-              title="⏹️ Kész"
-              onPress={handleStopListening}
-              variant="accent"
-              size="large"
-              disabled={isProcessing}
-              style={styles.button}
-            />
-          )}
-        </View>
-
-        {/* Engedély figyelmeztetés */}
-        {!hasPermission && (
-          <View style={styles.permissionWarning}>
-            <Text style={styles.permissionText}>
-              A játék használatához mikrofon engedélyre van szükség.
-            </Text>
-          </View>
-        )}
-
-        {/* Visszajelzés animáció */}
-        <FeedbackAnimation
-          visible={showFeedback}
-          message={feedbackMessage}
-          type={showFeedback && feedbackMessage.includes('ügyes') ? 'success' : 'encouragement'}
-        />
-        <LevelUpRocketScreen
-          visible={showLevelUp}
-          level={levelUpLevel}
-          reward={levelUpReward}
-          onClose={() => {
-          markLevelRewardSeen(levelUpLevel);
-          setShowLevelUp(false);
-        }}
-        />
+      <View style={styles.instructions}>
+        <Text style={gs.prompt}>
+          {gameState.isListening
+            ? '🎤 mondd ki hangosan!'
+            : 'kattints a lejátszás gombra, majd ismételd meg!'}
+        </Text>
       </View>
-    </SafeAreaView>
+
+      <View style={styles.buttons}>
+        <Button
+          title="🔊 lejátszás"
+          onPress={handlePlaySound}
+          variant="primary"
+          size="large"
+          disabled={isProcessing || gameState.isListening}
+        />
+        {!gameState.isListening ? (
+          <Button
+            title="🎤 mondd ki!"
+            onPress={handleStartListening}
+            variant="secondary"
+            size="large"
+            disabled={isProcessing || !hasPermission}
+          />
+        ) : (
+          <Button
+            title="⏹️ kész"
+            onPress={handleStopListening}
+            variant="accent"
+            size="large"
+            disabled={isProcessing}
+          />
+        )}
+      </View>
+
+      {!hasPermission && !isWeb && (
+        <View style={styles.permission}>
+          <Text style={gs.prompt}>a játékhoz mikrofon engedély kell.</Text>
+        </View>
+      )}
+    </ClassicGameLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.screenPadding,
-  },
-  scoreContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  scoreText: {
-    ...typography.bodyLarge,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  letterContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: spacing.xl,
-    minHeight: 200,
-  },
-  letter: {
-    ...typography.gameLetter,
-    color: colors.primary,
-    fontSize: undefined,
-  },
-  sentence: {
-    ...typography.gameWord,
-    color: colors.primary,
-    textAlign: 'center',
-    paddingHorizontal: spacing.sm,
-  },
-  instructionsContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
+  instructions: {
     padding: spacing.md,
-    backgroundColor: colors.backgroundLight,
-    borderRadius: spacing.cardBorderRadius,
+    marginBottom: spacing.md,
+    alignItems: 'center',
   },
-  instructionText: {
-    ...typography.body,
-    color: colors.text,
-    textAlign: 'center',
-  },
-  buttonContainer: {
-    gap: spacing.md,
-    marginTop: spacing.xl,
-  },
-  button: {
-    marginVertical: spacing.sm,
-  },
-  permissionWarning: {
+  buttons: { gap: spacing.md, marginTop: spacing.md },
+  permission: {
     marginTop: spacing.lg,
     padding: spacing.md,
-    backgroundColor: colors.cardBackground,
-    borderRadius: spacing.cardBorderRadius,
-    borderWidth: 2,
-    borderColor: colors.accent,
-  },
-  permissionText: {
-    ...typography.bodySmall,
-    color: colors.text,
-    textAlign: 'center',
+    alignItems: 'center',
   },
 });

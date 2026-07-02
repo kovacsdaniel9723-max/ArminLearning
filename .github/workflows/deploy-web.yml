@@ -6,35 +6,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  setup-pages:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Enable GitHub Pages (workflow build)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          API="https://api.github.com/repos/${{ github.repository }}/pages"
-          HEADERS=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GH_TOKEN}" -H "X-GitHub-Api-Version: 2022-11-28")
-          STATUS=$(curl -sS -o /tmp/pages_resp.json -w "%{http_code}" -X POST "${HEADERS[@]}" "$API" -d '{"build_type":"workflow"}')
-          echo "POST /pages → HTTP ${STATUS}"
-          cat /tmp/pages_resp.json || true
-          if [ "$STATUS" = "409" ] || [ "$STATUS" = "422" ]; then
-            echo "Pages already exists or legacy mode – switching to workflow build_type"
-            curl -sS -X PUT "${HEADERS[@]}" "$API" -d '{"build_type":"workflow"}' | tee /tmp/pages_put.json
-          fi
-
-  build:
-    needs: setup-pages
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,21 +30,34 @@ jobs:
       - name: Export web bundle
         run: npx expo export -p web
 
-      - name: Add .nojekyll for static assets
-        run: touch dist/.nojekyll
+      - name: Prepare static site
+        run: |
+          touch dist/.nojekyll
+          # SPA: ismeretlen útvonalak → index.html (Expo web client routing)
+          if [ ! -f dist/404.html ]; then
+            cp dist/index.html dist/404.html
+          fi
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        id: deploy
         with:
-          path: dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Configure GitHub Pages (gh-pages branch)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          API="https://api.github.com/repos/${{ github.repository }}/pages"
+          HDR=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GH_TOKEN}" -H "X-GitHub-Api-Version: 2022-11-28")
+          BODY='{"build_type":"legacy","source":{"branch":"gh-pages","path":"/"}}'
+          CODE=$(curl -sS -o /tmp/pages.json -w "%{http_code}" -X POST "${HDR[@]}" "$API" -d "$BODY")
+          echo "POST /pages → HTTP ${CODE}"
+          cat /tmp/pages.json
+          if [ "$CODE" != "201" ] && [ "$CODE" != "200" ]; then
+            curl -sS -X PUT "${HDR[@]}" "$API" -d "$BODY" | tee /tmp/pages_put.json
+          fi
+          echo ""
+          echo "Site URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"

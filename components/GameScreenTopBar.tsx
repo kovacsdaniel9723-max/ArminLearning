@@ -9,7 +9,7 @@ import { GameBackButton } from './navigation/GameBackButton';
 
 export const GameScreenTopBar: React.FC = () => (
   <View style={styles.bar}>
-    <GameBackButton variant="inline" />
+    <GameBackButton variant="prominent" label="← vissza" />
   </View>
 );
 

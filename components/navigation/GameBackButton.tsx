@@ -9,7 +9,7 @@ import { colors, spacing, typography, shadows } from '../../theme';
 
 interface GameBackButtonProps {
   label?: string;
-  variant?: 'header' | 'inline';
+  variant?: 'header' | 'inline' | 'prominent';
 }
 
 export const GameBackButton: React.FC<GameBackButtonProps> = ({
@@ -25,6 +25,19 @@ export const GameBackButton: React.FC<GameBackButtonProps> = ({
       navigation.navigate('GameSelection' as never);
     }
   };
+
+  if (variant === 'prominent') {
+    return (
+      <TouchableOpacity
+        style={[styles.prominentBtn, shadows.glow(colors.accent)]}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+      >
+        <Text style={styles.prominentText}>{label}</Text>
+      </TouchableOpacity>
+    );
+  }
 
   if (variant === 'inline') {
     return (
@@ -75,6 +88,20 @@ const styles = StyleSheet.create({
   inlineText: {
     ...typography.body,
     color: colors.primary,
+    fontWeight: '800',
+  },
+  prominentBtn: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm + 2,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: colors.accentDark,
+    borderBottomWidth: 4,
+  },
+  prominentText: {
+    ...typography.button,
+    color: colors.white,
     fontWeight: '800',
   },
 });

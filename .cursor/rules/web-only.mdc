@@ -1,0 +1,12 @@
+---
+description: Armin Learning – csak weboldal, nincs mobil app build/deploy
+alwaysApply: true
+---
+
+# Web-only projekt
+
+- **Csak weboldal** – GitHub Pages: `npm run build:web` → `.github/workflows/deploy-web.yml`
+- **Nincs mobil app** – ne indíts EAS/APK/Android/iOS buildet, ne javasolj app store publikálást
+- Web base path: `/ArminLearning` (`app.json`)
+- Live URL: https://kovacsdaniel9723-max.github.io/ArminLearning/
+- Pages forrás: **GitHub Actions** (Settings → Pages → Build and deployment → Source: GitHub Actions)

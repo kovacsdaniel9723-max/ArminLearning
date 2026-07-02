@@ -10,3 +10,4 @@ alwaysApply: true
 - Web base path: `/ArminLearning` (`app.json`)
 - Live URL: https://kovacsdaniel9723-max.github.io/ArminLearning/
 - Pages forrás: **GitHub Actions** (Settings → Pages → Build and deployment → Source: GitHub Actions)
+- Ha push után **két** workflow indul (`Deploy Web…` + `pages build and deployment`), a Pages még branch `/docs` módban van – állítsd át GitHub Actions-re (egyszeri beállítás)

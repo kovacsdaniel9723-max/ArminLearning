@@ -17,6 +17,7 @@ import {
   pickShapeHunt,
   pickMeasureTask,
 } from '../../../content/grade2/matematikaExtraData';
+import { shuffleArray, useRoundOptions } from '../utils/roundOptions';
 
 function OptionGrid({
   options,
@@ -32,7 +33,7 @@ function OptionGrid({
   return (
     <View style={styles.grid}>
       {options.map((opt, i) => (
-        <TouchableOpacity key={i} style={styles.option} onPress={() => onPick(i)} disabled={disabled}>
+        <TouchableOpacity key={`${String(opt)}-${i}`} style={styles.option} onPress={() => onPick(i)} disabled={disabled}>
           <Text style={styles.optionText}>{renderLabel ? renderLabel(opt) : String(opt)}</Text>
         </TouchableOpacity>
       ))}
@@ -44,14 +45,17 @@ export const NumberLineEngine: React.FC = () => {
   const session = useGameSession({ roundSeconds: 45 });
   const [task, setTask] = useState(() => pickNumberLineTask());
   const pos = task.start;
-  const optsSet = new Set<number>([task.answer]);
-  while (optsSet.size < 4) {
-    optsSet.add(task.answer + (Math.floor(Math.random() * 5) - 2) * task.table);
-  }
-  const opts = [...optsSet].filter((v) => v > 0).slice(0, 4);
-  while (opts.length < 4) opts.push(task.answer + opts.length * task.table);
-  opts.sort(() => Math.random() - 0.5);
-  const correctIdx = opts.indexOf(task.answer);
+
+  const { options: opts, correctIdx } = useRoundOptions(task, () => {
+    const optsSet = new Set<number>([task.answer]);
+    while (optsSet.size < 4) {
+      optsSet.add(task.answer + (Math.floor(Math.random() * 5) - 2) * task.table);
+    }
+    const built = [...optsSet].filter((v) => v > 0).slice(0, 4);
+    while (built.length < 4) built.push(task.answer + built.length * task.table);
+    const options = shuffleArray(built);
+    return { options, correctIdx: options.indexOf(task.answer) };
+  });
 
   const reset = () => setTask(pickNumberLineTask());
 
@@ -90,9 +94,12 @@ export const SharingEngine: React.FC = () => {
   const session = useGameSession({ roundSeconds: 50 });
   const [task, setTask] = useState(() => pickSharingTask());
   const reset = () => setTask(pickSharingTask());
-  const opts = [task.perGroup, task.perGroup + 1, task.perGroup - 1, task.groups].filter((v) => v > 0);
-  const unique = [...new Set(opts)].slice(0, 4).sort(() => Math.random() - 0.5);
-  const correctIdx = unique.indexOf(task.perGroup);
+
+  const { options: unique, correctIdx } = useRoundOptions(task, () => {
+    const raw = [task.perGroup, task.perGroup + 1, task.perGroup - 1, task.groups].filter((v) => v > 0);
+    const options = shuffleArray([...new Set(raw)].slice(0, 4));
+    return { options, correctIdx: options.indexOf(task.perGroup) };
+  });
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -128,9 +135,12 @@ export const ShoppingEngine: React.FC = () => {
   const session = useGameSession({ roundSeconds: 50 });
   const [task, setTask] = useState(() => pickShoppingTask());
   const reset = () => setTask(pickShoppingTask());
-  const opts = [task.change, task.change + 5, task.change - 5, task.price].filter((v) => v >= 0);
-  const unique = [...new Set(opts)].slice(0, 4).sort(() => Math.random() - 0.5);
-  const correctIdx = unique.indexOf(task.change);
+
+  const { options: unique, correctIdx } = useRoundOptions(task, () => {
+    const raw = [task.change, task.change + 5, task.change - 5, task.price].filter((v) => v >= 0);
+    const options = shuffleArray([...new Set(raw)].slice(0, 4));
+    return { options, correctIdx: options.indexOf(task.change) };
+  });
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -167,14 +177,17 @@ export const ClockEngine: React.FC = () => {
   const session = useGameSession({ roundSeconds: 45 });
   const [task, setTask] = useState(() => pickClockTask());
   const reset = () => setTask(pickClockTask());
-  const wrong = [
-    formatClock((task.hours % 12) + 1, task.minutes),
-    formatClock(task.hours, task.minutes === 0 ? 30 : 0),
-    formatClock(task.hours === 1 ? 12 : task.hours - 1, task.minutes),
-  ];
-  const correct = formatClock(task.hours, task.minutes);
-  const opts = [correct, ...wrong].sort(() => Math.random() - 0.5);
-  const correctIdx = opts.indexOf(correct);
+
+  const { options: opts, correctIdx } = useRoundOptions(task, () => {
+    const wrong = [
+      formatClock((task.hours % 12) + 1, task.minutes),
+      formatClock(task.hours, task.minutes === 0 ? 30 : 0),
+      formatClock(task.hours === 1 ? 12 : task.hours - 1, task.minutes),
+    ];
+    const correct = formatClock(task.hours, task.minutes);
+    const options = shuffleArray([correct, ...wrong]);
+    return { options, correctIdx: options.indexOf(correct) };
+  });
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -211,9 +224,12 @@ export const WordProblemEngine: React.FC = () => {
   const session = useGameSession({ roundSeconds: 55 });
   const [task, setTask] = useState(() => pickWordProblem());
   const reset = () => setTask(pickWordProblem());
-  const opts = [task.answer, task.answer + 1, task.answer - 1, task.answer + 2].filter((v) => v >= 0);
-  const unique = [...new Set(opts)].slice(0, 4).sort(() => Math.random() - 0.5);
-  const correctIdx = unique.indexOf(task.answer);
+
+  const { options: unique, correctIdx } = useRoundOptions(task, () => {
+    const raw = [task.answer, task.answer + 1, task.answer - 1, task.answer + 2].filter((v) => v >= 0);
+    const options = shuffleArray([...new Set(raw)].slice(0, 4));
+    return { options, correctIdx: options.indexOf(task.answer) };
+  });
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -276,7 +292,7 @@ export const ShapeHuntEngine: React.FC = () => {
       <Text style={styles.prompt}>keresd meg: {task.target} {task.targetEmoji}</Text>
       <View style={styles.grid}>
         {task.scene.map((s, i) => (
-          <TouchableOpacity key={i} style={styles.shapeBtn} onPress={() => onPick(i)} disabled={session.isProcessing}>
+          <TouchableOpacity key={`${s.shape}-${i}`} style={styles.shapeBtn} onPress={() => onPick(i)} disabled={session.isProcessing}>
             <Text style={styles.shapeEmoji}>{s.emoji}</Text>
           </TouchableOpacity>
         ))}

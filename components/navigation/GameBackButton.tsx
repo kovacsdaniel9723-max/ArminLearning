@@ -1,20 +1,19 @@
 /**
- * Vissza gomb játékból → játék választó (web-barát, nagy érintési felület)
+ * Vissza gomb – játékból a küldetés listába
  */
 
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { colors, spacing, typography } from '../../theme';
+import { colors, spacing, typography, shadows } from '../../theme';
 
 interface GameBackButtonProps {
   label?: string;
-  /** Fejléc (fehér szöveg) vs. tartalom (kék szöveg) */
   variant?: 'header' | 'inline';
 }
 
 export const GameBackButton: React.FC<GameBackButtonProps> = ({
-  label = '← játékok',
+  label = '← küldetések',
   variant = 'header',
 }) => {
   const navigation = useNavigation();
@@ -29,7 +28,11 @@ export const GameBackButton: React.FC<GameBackButtonProps> = ({
 
   if (variant === 'inline') {
     return (
-      <TouchableOpacity style={styles.inlineBtn} onPress={onPress} accessibilityRole="button">
+      <TouchableOpacity
+        style={[styles.inlineBtn, shadows.glow(colors.primary)]}
+        onPress={onPress}
+        accessibilityRole="button"
+      >
         <Text style={styles.inlineText}>{label}</Text>
       </TouchableOpacity>
     );
@@ -42,7 +45,6 @@ export const GameBackButton: React.FC<GameBackButtonProps> = ({
   );
 };
 
-/** Stack.Screen options – minden játék képernyőhöz */
 export function gameBackHeaderOptions() {
   return {
     headerBackVisible: false,
@@ -58,8 +60,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     ...typography.body,
-    color: colors.white,
-    fontWeight: '700',
+    color: colors.primary,
+    fontWeight: '800',
   },
   inlineBtn: {
     alignSelf: 'flex-start',
@@ -68,12 +70,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.primaryLight,
-    marginBottom: spacing.sm,
+    borderColor: colors.primary,
   },
   inlineText: {
     ...typography.body,
     color: colors.primary,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

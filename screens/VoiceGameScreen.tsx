@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   permissionWarning: {
     marginTop: spacing.lg,
     padding: spacing.md,
-    backgroundColor: colors.accentLight,
+    backgroundColor: colors.cardBackground,
     borderRadius: spacing.cardBorderRadius,
     borderWidth: 2,
     borderColor: colors.accent,

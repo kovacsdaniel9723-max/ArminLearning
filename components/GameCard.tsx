@@ -1,24 +1,18 @@
 /**
- * GameCard komponens
- * Játék kártyák a választáshoz
+ * Küldetés-kártya – játék választó (színes akcent csík, neon keret)
  */
 
 import React from 'react';
-import {
-  TouchableOpacity,
-  View,
-  Text,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { TouchableOpacity, View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { colors, spacing, typography, shadows } from '../theme';
 
 interface GameCardProps {
   title: string;
   description?: string;
-  icon?: string; // Emoji vagy ikon
+  icon?: string;
   onPress: () => void;
   style?: ViewStyle;
+  accentColor?: string;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -27,20 +21,25 @@ export const GameCard: React.FC<GameCardProps> = ({
   icon,
   onPress,
   style,
+  accentColor = colors.primary,
 }) => {
   return (
     <TouchableOpacity
-      style={[styles.card, style]}
+      style={[styles.card, shadows.card, style]}
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={0.88}
     >
-      {icon && (
-        <Text style={styles.icon}>{icon}</Text>
-      )}
-      <Text style={styles.title}>{title}</Text>
-      {description && (
-        <Text style={styles.description}>{description}</Text>
-      )}
+      <View style={[styles.accentBar, { backgroundColor: accentColor }]} />
+      <View style={styles.inner}>
+        <View style={[styles.iconWrap, { borderColor: accentColor }]}>
+          {icon ? <Text style={styles.icon}>{icon}</Text> : null}
+        </View>
+        <View style={styles.textCol}>
+          <Text style={styles.title}>{title}</Text>
+          {description ? <Text style={styles.description}>{description}</Text> : null}
+        </View>
+        <Text style={[styles.play, { color: accentColor }]}>▶</Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -48,36 +47,48 @@ export const GameCard: React.FC<GameCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.cardBackground,
-    borderRadius: spacing.cardBorderRadius,
-    padding: spacing.cardPadding,
-    marginVertical: spacing.cardMargin / 2,
-    minHeight: 120,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: colors.cardBorder,
+    overflow: 'hidden',
+    minHeight: 88,
+  },
+  accentBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 5,
+  },
+  inner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    paddingLeft: spacing.md + 4,
+    gap: spacing.md,
+  },
+  iconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    backgroundColor: colors.backgroundLight,
+    borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: colors.cardShadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
   },
-  icon: {
-    fontSize: 48,
-    marginBottom: spacing.sm,
-  },
+  icon: { fontSize: 32 },
+  textCol: { flex: 1 },
   title: {
     ...typography.h3,
     color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: 2,
   },
   description: {
     ...typography.bodySmall,
     color: colors.textLight,
-    textAlign: 'center',
+  },
+  play: {
+    fontSize: 22,
+    fontWeight: '800',
   },
 });

@@ -1,80 +1,79 @@
 /**
- * Typography rendszer
- * Nagy, olvasható betűtípusok gyerekeknek
+ * Typography – vastag, jól olvasható, játékos
  */
 
 export const typography = {
-  // Címsorok
   h1: {
-    fontSize: 36,
-    fontWeight: 'bold' as const,
-    lineHeight: 44,
-    letterSpacing: 0,
+    fontSize: 34,
+    fontWeight: '800' as const,
+    lineHeight: 42,
+    letterSpacing: 0.5,
   },
   h2: {
-    fontSize: 28,
-    fontWeight: 'bold' as const,
-    lineHeight: 36,
-    letterSpacing: 0,
+    fontSize: 26,
+    fontWeight: '800' as const,
+    lineHeight: 34,
+    letterSpacing: 0.3,
   },
   h3: {
-    fontSize: 24,
-    fontWeight: '600' as const,
-    lineHeight: 32,
-    letterSpacing: 0,
+    fontSize: 22,
+    fontWeight: '700' as const,
+    lineHeight: 30,
+    letterSpacing: 0.2,
   },
-  
-  // Szöveg
   body: {
     fontSize: 18,
-    fontWeight: '400' as const,
+    fontWeight: '500' as const,
     lineHeight: 26,
     letterSpacing: 0,
   },
   bodyLarge: {
     fontSize: 20,
-    fontWeight: '400' as const,
+    fontWeight: '500' as const,
     lineHeight: 28,
     letterSpacing: 0,
   },
   bodySmall: {
     fontSize: 16,
-    fontWeight: '400' as const,
+    fontWeight: '500' as const,
     lineHeight: 24,
     letterSpacing: 0,
   },
-  
-  // Gombok
   button: {
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontWeight: '800' as const,
     lineHeight: 28,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   buttonLarge: {
     fontSize: 24,
-    fontWeight: '600' as const,
+    fontWeight: '800' as const,
     lineHeight: 32,
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
-  
-  // Játék specifikus
+  label: {
+    fontSize: 13,
+    fontWeight: '700' as const,
+    lineHeight: 18,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
+  },
   gameLetter: {
-    fontSize: 120,
-    fontWeight: 'bold' as const,
-    lineHeight: 140,
+    fontSize: 112,
+    fontWeight: '800' as const,
+    lineHeight: 130,
     letterSpacing: 0,
   },
   gameNumber: {
-    fontSize: 100,
-    fontWeight: 'bold' as const,
-    lineHeight: 120,
+    fontSize: 96,
+    fontWeight: '800' as const,
+    lineHeight: 112,
     letterSpacing: 0,
   },
   gameWord: {
     fontSize: 32,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     lineHeight: 40,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
 };

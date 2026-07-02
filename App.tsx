@@ -46,14 +46,16 @@ function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <Stack.Navigator
         initialRouteName={grade ? 'Home' : 'GradeSelection'}
         screenOptions={{
-          headerStyle: { backgroundColor: colors.primary },
-          headerTintColor: colors.white,
-          headerTitleStyle: { fontWeight: 'bold' },
+          headerStyle: { backgroundColor: colors.backgroundLight },
+          headerTintColor: colors.primary,
+          headerTitleStyle: { fontWeight: '800', color: colors.text },
+          headerShadowVisible: false,
           headerBackTitleVisible: false,
+          contentStyle: { backgroundColor: colors.background },
         }}
       >
         <Stack.Screen name="GradeSelection" component={GradeSelectionScreen} options={{ title: 'osztály', headerShown: false }} />

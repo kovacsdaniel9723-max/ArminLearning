@@ -1,17 +1,10 @@
 /**
- * FeedbackAnimation komponens
- * Pozitív visszajelzések animációval
+ * Pozitív visszajelzés – „level up” pop
  */
 
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Easing,
-} from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { Text, StyleSheet, Animated, Easing } from 'react-native';
+import { colors, spacing, typography, shadows } from '../theme';
 
 interface FeedbackAnimationProps {
   visible: boolean;
@@ -22,7 +15,7 @@ interface FeedbackAnimationProps {
 
 export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
   visible,
-  message = 'Nagyszerű!',
+  message = 'ügyes vagy!',
   type = 'success',
   onAnimationComplete,
 }) => {
@@ -31,79 +24,61 @@ export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
 
   useEffect(() => {
     if (visible) {
-      // Animáció indítása
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
           useNativeDriver: true,
-          tension: 50,
-          friction: 7,
+          tension: 55,
+          friction: 6,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 250,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
       ]).start();
 
-      // Auto-hide 2 másodperc után
       const timer = setTimeout(() => {
         Animated.parallel([
           Animated.timing(scaleAnim, {
             toValue: 0,
             duration: 200,
-            easing: Easing.in(Easing.ease),
             useNativeDriver: true,
           }),
           Animated.timing(opacityAnim, {
             toValue: 0,
             duration: 200,
-            easing: Easing.in(Easing.ease),
             useNativeDriver: true,
           }),
-        ]).start(() => {
-          if (onAnimationComplete) {
-            onAnimationComplete();
-          }
-        });
-      }, 2000);
+        ]).start(() => onAnimationComplete?.());
+      }, 1800);
 
       return () => clearTimeout(timer);
-    } else {
-      // Reset animációk
-      scaleAnim.setValue(0);
-      opacityAnim.setValue(0);
     }
+    scaleAnim.setValue(0);
+    opacityAnim.setValue(0);
   }, [visible, scaleAnim, opacityAnim, onAnimationComplete]);
 
-  if (!visible) {
-    return null;
-  }
+  if (!visible) return null;
 
-  const getEmoji = () => {
-    switch (type) {
-      case 'success':
-        return '🎉';
-      case 'encouragement':
-        return '👏';
-      default:
-        return '✨';
-    }
-  };
+  const emoji = type === 'success' ? '🔥' : '💪';
+  const borderColor = type === 'success' ? colors.secondary : colors.accent;
 
   return (
     <Animated.View
       style={[
         styles.container,
+        shadows.glow(borderColor),
         {
           opacity: opacityAnim,
           transform: [{ scale: scaleAnim }],
+          borderColor,
         },
       ]}
     >
-      <Text style={styles.emoji}>{getEmoji()}</Text>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.emoji}>{emoji}</Text>
+      <Text style={[styles.message, { color: borderColor }]}>{message}</Text>
     </Animated.View>
   );
 };
@@ -111,26 +86,16 @@ export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: '40%',
-    left: '50%',
-    marginLeft: -100,
-    width: 200,
-    backgroundColor: colors.successLight,
+    top: '38%',
+    alignSelf: 'center',
+    width: 240,
+    backgroundColor: colors.cardBackground,
     borderRadius: 20,
     padding: spacing.lg,
     alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 3,
-    borderColor: colors.success,
     zIndex: 1000,
   },
-  emoji: {
-    fontSize: 64,
-    marginBottom: spacing.sm,
-  },
-  message: {
-    ...typography.h3,
-    color: colors.success,
-    textAlign: 'center',
-  },
+  emoji: { fontSize: 56, marginBottom: spacing.sm },
+  message: { ...typography.h3, textAlign: 'center' },
 });

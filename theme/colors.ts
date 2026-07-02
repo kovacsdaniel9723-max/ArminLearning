@@ -1,45 +1,65 @@
 /**
- * Gyerekbarát színpaletta
- * Barátságos, nem vibráló színek 6-7 éves gyerekeknek
+ * Űr-küldetés téma – vagány, játékos, de rendezett (ADHD/autizmus-barát)
+ * Magas kontraszt, fix elrendezés, nincs villogás
  */
 
 export const colors = {
-  // Alap színek
-  primary: '#4A90E2',      // Barátságos kék
-  primaryLight: '#6BA3E8',
-  primaryDark: '#357ABD',
-  
-  secondary: '#50C878',    // Vidám zöld
-  secondaryLight: '#6FD88A',
-  secondaryDark: '#3FA865',
-  
-  accent: '#FFB84D',        // Meleg narancs
-  accentLight: '#FFF4E6',
-  accentDark: '#FF9D2A',
-  
-  // Háttér színek
-  background: '#F5F7FA',
-  backgroundLight: '#FFFFFF',
-  backgroundDark: '#E8ECF0',
-  
-  // Szöveg színek
-  text: '#2C3E50',
-  textLight: '#5A6C7D',
-  textDark: '#1A252F',
-  
-  // Visszajelzés színek (csak pozitív!)
-  success: '#50C878',
-  successLight: '#E8F8F0',
-  
-  // Semleges színek
+  // Neon / játék akcentusok
+  primary: '#00D4FF',
+  primaryLight: '#67E8FF',
+  primaryDark: '#0099CC',
+
+  secondary: '#7CFF6B',
+  secondaryLight: '#A8FF9A',
+  secondaryDark: '#4AE038',
+
+  accent: '#FF6B2C',
+  accentLight: '#252035',
+  accentDark: '#E85D04',
+
+  // Űr háttér
+  background: '#0B1020',
+  backgroundLight: '#151B2E',
+  backgroundDark: '#060910',
+
+  // Szöveg – világos a sötét háttéren
+  text: '#F0F4FF',
+  textLight: '#9BA8C4',
+  textDark: '#FFFFFF',
+
+  success: '#7CFF6B',
+  successLight: '#1A3D28',
+
   white: '#FFFFFF',
   black: '#000000',
-  gray: '#95A5A6',
-  grayLight: '#BDC3C7',
-  grayDark: '#7F8C8D',
-  
-  // Játék specifikus színek
-  cardBackground: '#FFFFFF',
-  cardShadow: '#E1E8ED',
-  buttonHover: '#3FA865',
+  gray: '#6B7A99',
+  grayLight: '#3A4560',
+  grayDark: '#4A5675',
+
+  // Kártyák – „küldetés panel”
+  cardBackground: '#1A2238',
+  cardShadow: '#000000',
+  cardBorder: '#2E3A5C',
+  cardBorderGlow: '#00D4FF33',
+
+  buttonHover: '#4AE038',
+
+  // Tantárgy színek (2. osztály szekciók)
+  subjectMagyar: '#FF6B9D',
+  subjectMatek: '#00D4FF',
+  subjectKornyezet: '#7CFF6B',
+  subjectRajz: '#FFB347',
+  subjectZene: '#B388FF',
+  subjectTestnev: '#FF6B2C',
+  subjectDigitalis: '#67E8FF',
+};
+
+export const subjectAccent: Record<string, string> = {
+  magyar: colors.subjectMagyar,
+  matematika: colors.subjectMatek,
+  kornyezet: colors.subjectKornyezet,
+  rajz: colors.subjectRajz,
+  zene: colors.subjectZene,
+  testnev: colors.subjectTestnev,
+  digitalis: colors.subjectDigitalis,
 };

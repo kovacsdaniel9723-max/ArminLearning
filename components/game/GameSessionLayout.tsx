@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: colors.primaryLight,
+    borderColor: colors.primary,
   },
-  streakHot: { borderColor: colors.accent, backgroundColor: colors.accentLight },
-  statLabel: { ...typography.body, fontWeight: '700', color: colors.text },
+  streakHot: { borderColor: colors.accent, backgroundColor: colors.backgroundLight },
+  statLabel: { ...typography.body, fontWeight: '800', color: colors.primary },
 });

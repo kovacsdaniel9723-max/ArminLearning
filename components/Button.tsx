@@ -1,6 +1,5 @@
 /**
- * Gyerekbarát Button komponens
- * Nagy, színes, animált gombok
+ * Játékos gomb – 3D „ arcade ” stílus, nagy érintési felület
  */
 
 import React from 'react';
@@ -11,18 +10,27 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  View,
 } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { colors, spacing, typography, shadows } from '../theme';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'accent';
+  variant?: 'primary' | 'secondary' | 'accent' | 'ghost';
   size?: 'medium' | 'large';
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
+  icon?: string;
 }
+
+const VARIANTS = {
+  primary: { bg: colors.primary, border: colors.primaryDark, text: colors.backgroundDark },
+  secondary: { bg: colors.secondary, border: colors.secondaryDark, text: colors.backgroundDark },
+  accent: { bg: colors.accent, border: colors.accentDark, text: colors.white },
+  ghost: { bg: colors.backgroundLight, border: colors.cardBorder, text: colors.primary },
+};
 
 export const Button: React.FC<ButtonProps> = ({
   title,
@@ -32,70 +40,62 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   style,
+  icon,
 }) => {
-  const getBackgroundColor = () => {
-    if (disabled) return colors.grayLight;
-    switch (variant) {
-      case 'primary':
-        return colors.primary;
-      case 'secondary':
-        return colors.secondary;
-      case 'accent':
-        return colors.accent;
-      default:
-        return colors.primary;
-    }
-  };
-
-  const getTextStyle = (): TextStyle => {
-    if (size === 'large') {
-      return typography.buttonLarge;
-    }
-    return typography.button;
-  };
+  const v = VARIANTS[disabled ? 'ghost' : variant];
+  const h = size === 'large' ? spacing.buttonHeight + 12 : spacing.buttonHeight;
 
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        {
-          backgroundColor: getBackgroundColor(),
-          height: size === 'large' ? spacing.buttonHeight + 10 : spacing.buttonHeight,
-          paddingHorizontal: spacing.buttonPadding,
-        },
-        style,
-      ]}
+      style={[styles.wrap, { opacity: disabled ? 0.5 : 1 }, style]}
       onPress={onPress}
       disabled={disabled || loading}
-      activeOpacity={0.7}
+      activeOpacity={0.85}
     >
-      {loading ? (
-        <ActivityIndicator color={colors.white} />
-      ) : (
-        <Text style={[styles.text, getTextStyle(), { color: colors.white }]}>
-          {title}
-        </Text>
-      )}
+      <View
+        style={[
+          styles.button,
+          shadows.button,
+          {
+            backgroundColor: v.bg,
+            borderColor: v.border,
+            minHeight: h,
+            paddingHorizontal: spacing.buttonPadding,
+          },
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator color={v.text} />
+        ) : (
+          <View style={styles.row}>
+            {icon ? <Text style={styles.icon}>{icon}</Text> : null}
+            <Text
+              style={[
+                styles.text,
+                size === 'large' ? typography.buttonLarge : typography.button,
+                { color: v.text },
+              ]}
+            >
+              {title}
+            </Text>
+          </View>
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  wrap: { width: '100%' },
   button: {
-    borderRadius: 12,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderBottomWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: spacing.touchTargetMin,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  text: {
-    textAlign: 'center',
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  icon: { fontSize: 24 },
+  text: { textAlign: 'center' },
 });

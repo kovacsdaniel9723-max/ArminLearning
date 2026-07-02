@@ -1,13 +1,13 @@
 /**
- * HomeScreen
- * Főképernyő - gyerekbarát kezdőlap
+ * HomeScreen – űr-küldetés bázis
  */
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../components/Button';
-import { colors, spacing, typography } from '../theme';
+import { ScreenBackground } from '../components/ScreenBackground';
+import { colors, spacing, typography, shadows } from '../theme';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { useGrade } from '../context/GradeContext';
@@ -24,42 +24,93 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const g = grade ?? 1;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Armin Tanuló App</Text>
-          <Text style={styles.subtitle}>Játssz és tanulj! 🎮📚</Text>
-          <Text style={styles.gradeBadge}>{GRADE_LABELS[g]}</Text>
-        </View>
+    <ScreenBackground>
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.hero}>
+            <Text style={styles.heroEmoji}>🚀</Text>
+            <Text style={styles.title}>armin küldetés bázis</Text>
+            <View style={[styles.gradePill, shadows.glow(colors.primary)]}>
+              <Text style={styles.gradePillText}>⭐ {GRADE_LABELS[g]}</Text>
+            </View>
+            <Text style={styles.tagline}>válassz küldetést és gyűjts xp-t!</Text>
+          </View>
 
-        <View style={styles.buttonContainer}>
-          <Button title="Játékok" onPress={() => navigation.navigate('GameSelection')} variant="primary" size="large" style={styles.mainButton} />
-          <Button title="Haladás" onPress={() => navigation.navigate('Rewards')} variant="secondary" size="medium" style={styles.secondaryButton} />
-          <Button title="Osztály váltás" onPress={() => navigation.navigate('GradeSelection')} variant="secondary" size="medium" style={styles.secondaryButton} />
-          <Button title="Szülői beállítások" onPress={() => navigation.navigate('Parent')} variant="secondary" size="medium" style={styles.secondaryButton} />
-        </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="játék indítása"
+              icon="🎮"
+              onPress={() => navigation.navigate('GameSelection')}
+              variant="primary"
+              size="large"
+            />
+            <Button
+              title="haladás / jutalmak"
+              icon="🏆"
+              onPress={() => navigation.navigate('Rewards')}
+              variant="accent"
+              size="medium"
+            />
+            <Button
+              title="osztály váltás"
+              icon="🎒"
+              onPress={() => navigation.navigate('GradeSelection')}
+              variant="ghost"
+              size="medium"
+            />
+            <Button
+              title="szülői zóna"
+              icon="🔒"
+              onPress={() => navigation.navigate('Parent')}
+              variant="ghost"
+              size="medium"
+            />
+          </View>
 
-        <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>
-            Üdvözöllek! 👋{'\n'}
-            Válassz egy játékot és kezdj el tanulni!
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <View style={styles.tipBox}>
+            <Text style={styles.tipLabel}>tipp</Text>
+            <Text style={styles.tipText}>
+              rövid körök, sok pont – így gyorsabban szintet lépsz! 🔥
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { flexGrow: 1, padding: spacing.screenPadding },
-  header: { alignItems: 'center', marginTop: spacing.xxl, marginBottom: spacing.xl },
-  title: { ...typography.h1, color: colors.primary, marginBottom: spacing.sm },
-  subtitle: { ...typography.bodyLarge, color: colors.textLight },
-  gradeBadge: { ...typography.h3, color: colors.secondary, marginTop: spacing.sm },
-  buttonContainer: { marginVertical: spacing.xl, gap: spacing.md },
-  mainButton: { marginBottom: spacing.md },
-  secondaryButton: { marginTop: spacing.sm },
-  welcomeContainer: { backgroundColor: colors.backgroundLight, borderRadius: spacing.cardBorderRadius, padding: spacing.lg, marginTop: spacing.xl, borderWidth: 2, borderColor: colors.primaryLight },
-  welcomeText: { ...typography.body, color: colors.text, textAlign: 'center', lineHeight: 28 },
+  container: { flex: 1 },
+  scrollContent: { flexGrow: 1, padding: spacing.screenPadding, paddingBottom: spacing.xxl },
+  hero: { alignItems: 'center', marginTop: spacing.lg, marginBottom: spacing.xl },
+  heroEmoji: { fontSize: 72, marginBottom: spacing.sm },
+  title: {
+    ...typography.h1,
+    color: colors.primary,
+    textAlign: 'center',
+    textShadowColor: colors.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
+  gradePill: {
+    marginTop: spacing.md,
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  gradePillText: { ...typography.h3, color: colors.secondary },
+  tagline: { ...typography.body, color: colors.textLight, marginTop: spacing.md, textAlign: 'center' },
+  buttonContainer: { gap: spacing.md, marginBottom: spacing.xl },
+  tipBox: {
+    backgroundColor: colors.backgroundLight,
+    borderRadius: spacing.cardBorderRadius,
+    padding: spacing.lg,
+    borderWidth: 2,
+    borderColor: colors.cardBorder,
+  },
+  tipLabel: { ...typography.label, color: colors.accent, marginBottom: spacing.xs },
+  tipText: { ...typography.body, color: colors.text, lineHeight: 26 },
 });

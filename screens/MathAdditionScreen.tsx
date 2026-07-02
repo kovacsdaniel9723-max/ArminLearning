@@ -24,6 +24,7 @@ import {
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'MathAdditionGame'>;
@@ -104,6 +105,7 @@ export const MathAdditionScreen: React.FC<Props> = () => {
   if (!gameState.currentTask) {
     return (
       <SafeAreaView style={styles.container}>
+        <GameScreenTopBar />
         <View style={styles.centerContainer}>
           <Text style={styles.loadingText}>Betöltés...</Text>
         </View>
@@ -115,6 +117,7 @@ export const MathAdditionScreen: React.FC<Props> = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         <View style={styles.scoreContainer}>
           <Text style={styles.scoreText}>

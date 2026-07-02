@@ -30,6 +30,7 @@ import type { HangmanState } from './types';
 import { recordGamePlayed } from '../../utils/stats';
 import { addCorrectAnswer, markLevelRewardSeen } from '../../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../../components/GameScreenTopBar';
 import type { Reward } from '../../rewards/rewards';
 import * as Speech from 'expo-speech';
 
@@ -124,6 +125,7 @@ export const HangmanGameScreen: React.FC<Props> = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}

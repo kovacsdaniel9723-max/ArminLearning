@@ -11,6 +11,7 @@ import { getRandomReadingTask, type ReadingTask } from '../content/grade2/readin
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 export const ReadingGameScreen: React.FC = () => {
@@ -54,6 +55,7 @@ export const ReadingGameScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         <Text style={styles.score}>pontszám: {score} / {total}</Text>
         <View style={styles.sentenceBox}>

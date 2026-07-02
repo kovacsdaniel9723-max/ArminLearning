@@ -19,6 +19,7 @@ import { FeedbackAnimation } from '../components/FeedbackAnimation';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 // Word-Picture Matching
@@ -231,6 +232,7 @@ export const TextGameScreen: React.FC<TextGameScreenProps> = ({ route, navigatio
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         <View style={styles.scoreContainer}>
           <Text style={styles.scoreText}>

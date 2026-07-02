@@ -24,6 +24,7 @@ import {
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 type LetterGameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'LetterGame'>;
@@ -79,6 +80,7 @@ export const LetterGameScreen: React.FC<LetterGameScreenProps> = ({ navigation }
   if (!gameState.currentQuestion) {
     return (
       <SafeAreaView style={styles.container}>
+        <GameScreenTopBar />
         <View style={styles.centerContainer}>
           <Text style={styles.loadingText}>Betöltés...</Text>
         </View>
@@ -88,6 +90,7 @@ export const LetterGameScreen: React.FC<LetterGameScreenProps> = ({ navigation }
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         {/* Pontszám */}
         <View style={styles.scoreContainer}>

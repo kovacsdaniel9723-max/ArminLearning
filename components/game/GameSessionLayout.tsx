@@ -9,6 +9,7 @@ import { colors, spacing, typography } from '../../theme';
 import { FeedbackAnimation } from '../FeedbackAnimation';
 import { LevelUpRocketScreen } from '../LevelUpRocketScreen';
 import { MovementBreakModal } from './MovementBreakModal';
+import { GameBackButton } from '../navigation/GameBackButton';
 import type { Reward } from '../../rewards/rewards';
 import type { MovementChallenge } from '../../content/grade2/testnevData';
 
@@ -53,6 +54,7 @@ export const GameSessionLayout: React.FC<GameSessionLayoutProps> = ({
 }) => {
   const header = (
     <View style={styles.header}>
+      <GameBackButton variant="inline" />
       {title ? <Text style={styles.title}>{title}</Text> : null}
       <View style={styles.statsRow}>
         <View style={styles.statBadge}>

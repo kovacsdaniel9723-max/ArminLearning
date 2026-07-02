@@ -37,6 +37,7 @@ import { requestMicrophonePermission, checkMicrophonePermission } from '../utils
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 import { isWeb } from '../utils/platform';
 
@@ -150,6 +151,7 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         {/* Pontszám */}
         <View style={styles.scoreContainer}>

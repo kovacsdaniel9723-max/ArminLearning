@@ -11,6 +11,7 @@ import { createSentenceTask, checkSentenceOrder, type SentenceTask } from '../co
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 export const SentenceGameScreen: React.FC = () => {
@@ -70,6 +71,7 @@ export const SentenceGameScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.score}>pontszám: {score} / {total}</Text>
         <Text style={styles.prompt}>rakd össze a mondatot!</Text>

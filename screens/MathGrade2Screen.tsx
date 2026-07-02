@@ -18,6 +18,7 @@ import {
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 const APPLE = '🍎';
@@ -126,6 +127,7 @@ export const MathGrade2Screen: React.FC = () => {
   if (!gameState.currentTask) {
     return (
       <SafeAreaView style={styles.container}>
+        <GameScreenTopBar />
         <Text style={styles.loading}>betöltés...</Text>
       </SafeAreaView>
     );
@@ -133,6 +135,7 @@ export const MathGrade2Screen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.score}>pontszám: {gameState.score} / {gameState.totalQuestions}</Text>
         <Text style={styles.question}>{getQuestionText(gameState.currentTask)}</Text>

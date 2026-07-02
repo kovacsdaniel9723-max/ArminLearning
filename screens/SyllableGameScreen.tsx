@@ -11,6 +11,7 @@ import { getRandomSyllableTask, type SyllableTask } from '../content/grade2/syll
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 export const SyllableGameScreen: React.FC = () => {
@@ -54,6 +55,7 @@ export const SyllableGameScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         <Text style={styles.score}>pontszám: {score} / {total}</Text>
         <Text style={styles.prompt}>bontsd szótagokra:</Text>

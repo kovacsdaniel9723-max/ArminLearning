@@ -24,6 +24,7 @@ import {
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import { GameScreenTopBar } from '../components/GameScreenTopBar';
 import type { Reward } from '../rewards/rewards';
 
 type NumberGameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'NumberGame'>;
@@ -77,6 +78,7 @@ export const NumberGameScreen: React.FC<NumberGameScreenProps> = ({ navigation }
   if (!gameState.currentQuestion) {
     return (
       <SafeAreaView style={styles.container}>
+        <GameScreenTopBar />
         <View style={styles.centerContainer}>
           <Text style={styles.loadingText}>Betöltés...</Text>
         </View>
@@ -86,6 +88,7 @@ export const NumberGameScreen: React.FC<NumberGameScreenProps> = ({ navigation }
 
   return (
     <SafeAreaView style={styles.container}>
+      <GameScreenTopBar />
       <View style={styles.content}>
         {/* Pontszám */}
         <View style={styles.scoreContainer}>

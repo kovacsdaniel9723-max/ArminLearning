@@ -24,8 +24,8 @@ import {
   getDefaultSettings,
   loadStats,
   getDefaultStats,
-  initializeStats,
 } from '../utils/storage';
+import { initializeStats } from '../utils/stats';
 import { ParentSettings, GameStats } from '../types';
 
 type ParentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Parent'>;

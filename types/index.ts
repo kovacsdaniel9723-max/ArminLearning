@@ -10,7 +10,8 @@ export type GameType =
   | 'wordPicture' 
   | 'missingLetter' 
   | 'firstLetter' 
-  | 'voice';
+  | 'voice'
+  | 'mathAddition';
 
 // Betűfelismerő játék
 export interface LetterQuestion {
@@ -64,6 +65,7 @@ export interface ParentSettings {
 
 // Navigáció
 export type RootStackParamList = {
+  GradeSelection: undefined;
   Home: undefined;
   GameSelection: undefined;
   LetterGame: undefined;
@@ -71,5 +73,12 @@ export type RootStackParamList = {
   TextGame: { gameType: 'wordPicture' | 'missingLetter' | 'firstLetter' };
   HangmanGame: undefined;
   VoiceGame: undefined;
+  MathAdditionGame: undefined;
+  SyllableGame: undefined;
+  ReadingGame: undefined;
+  SentenceGame: undefined;
+  PatternGame: undefined;
+  MathGrade2Game: undefined;
   Parent: undefined;
+  Rewards: undefined;
 };

@@ -28,6 +28,9 @@ import {
 } from './HangmanLogic';
 import type { HangmanState } from './types';
 import { recordGamePlayed } from '../../utils/stats';
+import { addCorrectAnswer, markLevelRewardSeen } from '../../rewards/RewardLogic';
+import { LevelUpRocketScreen } from '../../components/LevelUpRocketScreen';
+import type { Reward } from '../../rewards/rewards';
 import * as Speech from 'expo-speech';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'HangmanGame'>;
@@ -47,6 +50,9 @@ export const HangmanGameScreen: React.FC<Props> = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackType, setFeedbackType] = useState<'success' | 'encouragement'>('success');
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpLevel, setLevelUpLevel] = useState(0);
+  const [levelUpReward, setLevelUpReward] = useState<Reward | undefined>(undefined);
 
   useEffect(() => {
     recordGamePlayed();
@@ -57,11 +63,11 @@ export const HangmanGameScreen: React.FC<Props> = () => {
   const playing = !won && !over;
   const guessedSet = useMemo(() => new Set(state.guessedLetters), [state.guessedLetters]);
 
-  const handleLetter = (letter: string) => {
+  const handleLetter = async (letter: string) => {
     if (!playing) return;
     const next = guessLetter(state, letter);
     setGame((prev) => ({ ...prev, state: next }));
-    if (next.guessedLetters.includes(letter.toUpperCase())) {
+    if (next.guessedLetters.includes(letter.toLowerCase().trim())) {
       setFeedbackMessage('Nagyszerű! ⭐');
       setFeedbackType('success');
       setShowFeedback(true);
@@ -72,6 +78,12 @@ export const HangmanGameScreen: React.FC<Props> = () => {
       setFeedbackType('success');
       setShowFeedback(true);
       setTimeout(() => setShowFeedback(false), 2000);
+      const { leveledUp, newLevel, reward } = await addCorrectAnswer();
+      if (leveledUp && newLevel != null) {
+        setLevelUpLevel(newLevel);
+        setLevelUpReward(reward);
+        setShowLevelUp(true);
+      }
     }
   };
 
@@ -205,6 +217,15 @@ export const HangmanGameScreen: React.FC<Props> = () => {
         visible={showFeedback}
         message={feedbackMessage}
         type={feedbackType}
+      />
+      <LevelUpRocketScreen
+        visible={showLevelUp}
+        level={levelUpLevel}
+        reward={levelUpReward}
+        onClose={() => {
+          markLevelRewardSeen(levelUpLevel);
+          setShowLevelUp(false);
+        }}
       />
     </SafeAreaView>
   );

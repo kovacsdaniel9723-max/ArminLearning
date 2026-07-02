@@ -101,7 +101,27 @@ export const numberQuestions: NumberQuestion[] = [
 /**
  * Véletlenszerű kérdés kiválasztása
  */
+import { getCurrentGrade } from '../../utils/gradeState';
+
+function buildGrade2NumberQuestion(): NumberQuestion {
+  const number = 1 + Math.floor(Math.random() * 100);
+  const wrong1 = number + 1 + Math.floor(Math.random() * 5);
+  const wrong2 = Math.max(1, number - 1 - Math.floor(Math.random() * 5));
+  const counts = [number, wrong1, wrong2].sort(() => Math.random() - 0.5);
+  const correctIndex = counts.indexOf(number);
+  const iconGroups = counts.map((count) => ({
+    count,
+    icons: Array.from({ length: Math.min(count, 10) }, () => '⭐').concat(
+      count > 10 ? [`+${count - 10}`] : []
+    ),
+  }));
+  return { number, iconGroups, correctIndex };
+}
+
 export const getRandomNumberQuestion = (): NumberQuestion => {
+  if (getCurrentGrade() === 2) {
+    return buildGrade2NumberQuestion();
+  }
   const randomIndex = Math.floor(Math.random() * numberQuestions.length);
   return numberQuestions[randomIndex];
 };

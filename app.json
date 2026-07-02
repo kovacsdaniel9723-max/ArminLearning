@@ -5,6 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "experiments": {
+      "baseUrl": "/ArminLearning"
+    },
     "splash": {
       "resizeMode": "contain",
       "backgroundColor": "#4A90E2"
@@ -22,10 +25,14 @@
       },
       "package": "com.armin.learningapp",
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
-    "web": {},
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
     "plugins": [
       [
         "expo-av",
@@ -33,7 +40,14 @@
           "microphonePermission": "Allow Armin Learning App to access your microphone for voice games."
         }
       ],
-      "expo-asset"
-    ]
+      "expo-asset",
+      "expo-audio",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ed36f6fe-db63-4d44-a0b9-2878be12a2f0"
+      }
+    }
   }
 }

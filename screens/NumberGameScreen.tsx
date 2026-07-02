@@ -21,7 +21,10 @@ import {
   loadNextQuestion,
   NumberGameState,
 } from '../games/numberGame/NumberGameLogic';
-import { recordCorrectAnswer, recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
+import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
+import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
+import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import type { Reward } from '../rewards/rewards';
 
 type NumberGameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'NumberGame'>;
 
@@ -34,6 +37,9 @@ export const NumberGameScreen: React.FC<NumberGameScreenProps> = ({ navigation }
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpLevel, setLevelUpLevel] = useState(0);
+  const [levelUpReward, setLevelUpReward] = useState<Reward | undefined>(undefined);
 
   useEffect(() => {
     recordGamePlayed();
@@ -47,7 +53,12 @@ export const NumberGameScreen: React.FC<NumberGameScreenProps> = ({ navigation }
 
     if (isCorrect) {
       setFeedbackMessage('Nagyszerű! 🎉');
-      await recordCorrectAnswer();
+      const { leveledUp, newLevel, reward } = await recordCorrectAnswerAndCheckLevelUp();
+      if (leveledUp && newLevel != null) {
+        setLevelUpLevel(newLevel);
+        setLevelUpReward(reward);
+        setShowLevelUp(true);
+      }
     } else {
       setFeedbackMessage('Próbáld újra! 💪');
       await recordIncorrectAnswer();
@@ -117,6 +128,15 @@ export const NumberGameScreen: React.FC<NumberGameScreenProps> = ({ navigation }
           visible={showFeedback}
           message={feedbackMessage}
           type={showFeedback && feedbackMessage.includes('Nagyszerű') ? 'success' : 'encouragement'}
+        />
+        <LevelUpRocketScreen
+          visible={showLevelUp}
+          level={levelUpLevel}
+          reward={levelUpReward}
+          onClose={() => {
+          markLevelRewardSeen(levelUpLevel);
+          setShowLevelUp(false);
+        }}
         />
       </View>
     </SafeAreaView>

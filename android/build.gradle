@@ -26,7 +26,7 @@ ext {
   // Android SDK versions - Expo SDK 54 compatible
   compileSdkVersion = 35
   targetSdkVersion = 35
-  minSdkVersion = 23
+  minSdkVersion = 24
   buildToolsVersion = "35.0.0"
   
   // NDK version - will be set by React Native plugin if available

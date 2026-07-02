@@ -17,225 +17,354 @@ import { WORDS } from './wordData';
 export const wordPictureQuestions: WordPictureQuestion[] = [
   {
     image: '🍎',
-    words: ['ALMA', 'KUTYA', 'HÁZ'],
+    words: ['alma', 'kutya', 'ház'],
     correctIndex: 0,
   },
   {
     image: '🐱',
-    words: ['MACSKA', 'KUTYA', 'LÓ'],
+    words: ['macska', 'kutya', 'ló'],
     correctIndex: 0,
   },
   {
     image: '🐶',
-    words: ['MACSKA', 'KUTYA', 'LÓ'],
+    words: ['macska', 'kutya', 'ló'],
     correctIndex: 1,
   },
   {
     image: '🐴',
-    words: ['MACSKA', 'KUTYA', 'LÓ'],
+    words: ['macska', 'kutya', 'ló'],
     correctIndex: 2,
   },
   {
     image: '🏠',
-    words: ['HÁZ', 'AUTÓ', 'FA'],
+    words: ['ház', 'autó', 'fa'],
     correctIndex: 0,
   },
   {
     image: '🐸',
-    words: ['BÉKA', 'CICA', 'KUTYA'],
+    words: ['béka', 'cica', 'kutya'],
     correctIndex: 0,
   },
   {
     image: '🦋',
-    words: ['PILLANGÓ', 'BOGÁR', 'CSIGA'],
+    words: ['pillangó', 'bogár', 'csiga'],
     correctIndex: 0,
   },
   {
     image: '🐻',
-    words: ['MEDVE', 'FARKAS', 'NYÚL'],
+    words: ['medve', 'farkas', 'nyúl'],
     correctIndex: 0,
   },
   {
     image: '🐰',
-    words: ['MEDVE', 'FARKAS', 'NYÚL'],
+    words: ['medve', 'farkas', 'nyúl'],
     correctIndex: 2,
   },
   {
     image: '🦀',
-    words: ['RÁK', 'HAL', 'CSIGA'],
+    words: ['rák', 'hal', 'csiga'],
     correctIndex: 0,
   },
   {
     image: '🐟',
-    words: ['RÁK', 'HAL', 'CSIGA'],
+    words: ['rák', 'hal', 'csiga'],
     correctIndex: 1,
   },
   {
     image: '🦌',
-    words: ['ŐZ', 'ÖKÖR', 'LÓ'],
+    words: ['őz', 'ökör', 'ló'],
     correctIndex: 0,
   },
   {
     image: '🚲',
-    words: ['BICIKLI', 'AUTÓ', 'LÓ'],
+    words: ['bicikli', 'autó', 'ló'],
     correctIndex: 0,
   },
   {
     image: '⚽',
-    words: ['LABDA', 'GOLYÓ', 'KULCS'],
+    words: ['labda', 'golyó', 'kulcs'],
     correctIndex: 0,
   },
   {
     image: '🕐',
-    words: ['ÓRA', 'TOLL', 'KULCS'],
+    words: ['óra', 'toll', 'kulcs'],
     correctIndex: 0,
   },
   {
     image: '🕯️',
-    words: ['GYERTYA', 'LÁMPA', 'FÉNY'],
+    words: ['gyertya', 'lámpa', 'fény'],
     correctIndex: 0,
   },
   {
     image: '🏳️',
-    words: ['ZÁSZLÓ', 'KÉP', 'TÁNYÉR'],
+    words: ['zászló', 'kép', 'tányér'],
     correctIndex: 0,
   },
   {
     image: '🦓',
-    words: ['ZEBRA', 'LÓ', 'ÖKÖR'],
+    words: ['zebra', 'ló', 'ökör'],
     correctIndex: 0,
   },
 ];
 
-// Hiányzó betű minták - a word_assets_summary.txt alapján
+// Hiányzó betű minták - teljes szavakkal, missingIndex mutatja a hiányzó betű pozícióját
 export const missingLetterQuestions: MissingLetterQuestion[] = [
   {
-    word: 'B_A',
+    word: 'béka',
     missingIndex: 1,
-    options: ['B', 'É', 'K'],
-    correctIndex: 1, // BÉKA
+    options: ['b', 'é', 'k'],
+    correctIndex: 1,
   },
   {
-    word: 'C_C_A',
+    word: 'cica',
     missingIndex: 1,
-    options: ['C', 'I', 'A'],
-    correctIndex: 1, // CICA
+    options: ['c', 'i', 'a'],
+    correctIndex: 1,
   },
   {
-    word: 'A_L_A',
+    word: 'alma',
     missingIndex: 1,
-    options: ['A', 'L', 'M'],
-    correctIndex: 1, // ALMA
+    options: ['a', 'l', 'm'],
+    correctIndex: 1,
   },
   {
-    word: 'M_C_S_A',
+    word: 'macska',
     missingIndex: 1,
-    options: ['M', 'A', 'C'],
-    correctIndex: 1, // MACSKA
+    options: ['m', 'a', 'c'],
+    correctIndex: 1,
   },
   {
-    word: 'P_L_L_A',
+    word: 'pillangó',
     missingIndex: 1,
-    options: ['P', 'I', 'L'],
-    correctIndex: 1, // PILLANGÓ
+    options: ['p', 'i', 'l'],
+    correctIndex: 1,
   },
   {
-    word: 'K_T_Y_A',
+    word: 'kutya',
     missingIndex: 1,
-    options: ['K', 'U', 'T'],
-    correctIndex: 1, // KUTYA
+    options: ['k', 'u', 't'],
+    correctIndex: 1,
   },
   {
-    word: 'H_L',
+    word: 'hal',
     missingIndex: 1,
-    options: ['H', 'A', 'L'],
-    correctIndex: 1, // HAL
+    options: ['h', 'a', 'l'],
+    correctIndex: 1,
   },
   {
-    word: 'H_Z',
+    word: 'ház',
     missingIndex: 1,
-    options: ['H', 'Á', 'Z'],
-    correctIndex: 1, // HÁZ
+    options: ['h', 'á', 'z'],
+    correctIndex: 1,
   },
   {
-    word: 'L_B_D_A',
+    word: 'labda',
     missingIndex: 1,
-    options: ['L', 'A', 'B'],
-    correctIndex: 1, // LABDA
+    options: ['l', 'a', 'b'],
+    correctIndex: 1,
   },
   {
-    word: 'M_D_V_E',
+    word: 'medve',
     missingIndex: 1,
-    options: ['M', 'E', 'D'],
-    correctIndex: 1, // MEDVE
+    options: ['m', 'e', 'd'],
+    correctIndex: 1,
   },
   {
-    word: 'T_L',
+    word: 'toll',
     missingIndex: 1,
-    options: ['T', 'O', 'L'],
-    correctIndex: 1, // TOLL
+    options: ['t', 'o', 'l'],
+    correctIndex: 1,
   },
   {
-    word: 'T_NY_R',
+    word: 'tányér',
     missingIndex: 1,
-    options: ['T', 'Á', 'N'],
-    correctIndex: 1, // TÁNYÉR
+    options: ['t', 'á', 'n'],
+    correctIndex: 1,
   },
   {
-    word: 'S_Z',
+    word: 'szó',
     missingIndex: 1,
-    options: ['S', 'Z', 'Ó'],
-    correctIndex: 1, // SZÓ
+    options: ['s', 'z', 'ó'],
+    correctIndex: 1,
   },
   {
-    word: 'S_Z_N',
+    word: 'szín',
     missingIndex: 1,
-    options: ['S', 'Z', 'Í'],
-    correctIndex: 1, // SZÍN
+    options: ['s', 'z', 'í'],
+    correctIndex: 1,
   },
   {
-    word: 'S_Z_L',
+    word: 'szél',
     missingIndex: 1,
-    options: ['S', 'Z', 'É'],
-    correctIndex: 1, // SZÉL
+    options: ['s', 'z', 'é'],
+    correctIndex: 1,
   },
   {
-    word: 'Z_S',
+    word: 'zászló',
     missingIndex: 1,
-    options: ['Z', 'Á', 'S'],
-    correctIndex: 1, // ZÁSZLÓ
+    options: ['z', 'á', 's'],
+    correctIndex: 1,
   },
   {
-    word: 'Z_E_B_R_A',
+    word: 'zebra',
     missingIndex: 1,
-    options: ['Z', 'E', 'B'],
-    correctIndex: 1, // ZEBRA
+    options: ['z', 'e', 'b'],
+    correctIndex: 1,
   },
   {
-    word: 'G_Y_R_T_Y_A',
+    word: 'gyertya',
     missingIndex: 1,
-    options: ['G', 'Y', 'E'],
-    correctIndex: 1, // GYERTYA
+    options: ['g', 'y', 'e'],
+    correctIndex: 1,
   },
   {
-    word: 'F_A_K',
+    word: 'fakó',
     missingIndex: 1,
-    options: ['F', 'A', 'K'],
-    correctIndex: 1, // FAKÓ
+    options: ['f', 'a', 'k'],
+    correctIndex: 1,
   },
   {
-    word: 'F_R_K',
+    word: 'farkas',
     missingIndex: 1,
-    options: ['F', 'A', 'R'],
-    correctIndex: 1, // FARKAS
+    options: ['f', 'a', 'r'],
+    correctIndex: 1,
   },
 ];
+
+// Szó-emoji mapping az első betű játékhoz (kisbetűs kulcsok)
+const WORD_EMOJI_MAP: Record<string, string> = {
+  'alma': '🍎',
+  'angyal': '👼',
+  'apác': '👩‍🦲',
+  'apó': '👴',
+  'ágy': '🛏️',
+  'állat': '🐾',
+  'ár': '💰',
+  'árnyék': '🌑',
+  'árpa': '🌾',
+  'árva': '👶',
+  'baba': '👶',
+  'bár': '🍺',
+  'bátor': '🛡️',
+  'béka': '🐸',
+  'bér': '💰',
+  'bélyeg': '📮',
+  'bicikli': '🚲',
+  'bika': '🐂',
+  'bili': '🎱',
+  'bogár': '🐛',
+  'bolt': '🏪',
+  'bor': '🍷',
+  'bot': '🪄',
+  'cica': '🐱',
+  'cukor': '🍬',
+  'csiga': '🐌',
+  'csoki': '🍫',
+  'dada': '👶',
+  'dallam': '🎵',
+  'daru': '🦩',
+  'déli': '🌞',
+  'dísz': '✨',
+  'dolgozó': '👷',
+  'dongó': '🐝',
+  'elem': '🔋',
+  'ébred': '☀️',
+  'ég': '☁️',
+  'élelem': '🍞',
+  'ének': '🎵',
+  'ér': '💉',
+  'erdő': '🌲',
+  'eskü': '✋',
+  'és': '➕',
+  'étkezik': '🍽️',
+  'fakó': '🌳',
+  'fák': '🌳',
+  'fal': '🧱',
+  'farkas': '🐺',
+  'fél': '😰',
+  'fény': '💡',
+  'fiú': '👦',
+  'fű': '🌱',
+  'gép': '💻',
+  'golyó': '⚽',
+  'gyertya': '🕯️',
+  'gyöngy': '💎',
+  'ház': '🏠',
+  'hal': '🐟',
+  'hang': '🔊',
+  'hét': '7️⃣',
+  'híd': '🌉',
+  'hó': '❄️',
+  'igaz': '✅',
+  'illat': '🌸',
+  'ima': '🙏',
+  'ír': '✍️',
+  'jár': '🚶',
+  'jég': '🧊',
+  'jó': '👍',
+  'kakas': '🐓',
+  'kép': '🖼️',
+  'kert': '🌳',
+  'kéz': '✋',
+  'kis': '👶',
+  'kör': '⭕',
+  'köz': '📍',
+  'kuka': '🗑️',
+  'kulcs': '🗝️',
+  'kutya': '🐶',
+  'labda': '⚽',
+  'láb': '🦶',
+  'lép': '🐛',
+  'ló': '🐴',
+  'lóca': '🦌',
+  'már': '⏰',
+  'macska': '🐱',
+  'medve': '🐻',
+  'méh': '🐝',
+  'méz': '🍯',
+  'mű': '🎭',
+  'nap': '☀️',
+  'néz': '👀',
+  'nyár': '☀️',
+  'nyúl': '🐰',
+  'óra': '🕐',
+  'ökör': '🐂',
+  'őz': '🦌',
+  'párna': '🛏️',
+  'pénz': '💰',
+  'pillangó': '🦋',
+  'rák': '🦀',
+  'rét': '🌾',
+  'sár': '🌧️',
+  'sátor': '⛺',
+  'siker': '🎉',
+  'szár': '🌱',
+  'szél': '💨',
+  'szín': '🎨',
+  'szó': '💬',
+  'tányér': '🍽️',
+  'tér': '📍',
+  'toll': '✏️',
+  'tűz': '🔥',
+  'tükör': '🪞',
+  'tücsök': '🦗',
+  'ujj': '👆',
+  'út': '🛣️',
+  'üveg': '🥃',
+  'üzlet': '🏪',
+  'vár': '🏰',
+  'víz': '💧',
+  'zászló': '🏳️',
+  'zebra': '🦓',
+  'zene': '🎵',
+  'zsák': '👜',
+};
 
 // Első betű felismerés: WORDS listából generáljuk
 // Jelenleg emoji-kat használunk, később valódi képekkel lesznek helyettesítve
 export const firstLetterQuestions: FirstLetterQuestion[] = WORDS.slice(0, 30).map((wordItem, index) => {
   // Választunk 2 másik betűt, ami nem az első betű
-  const allLetters = ['A', 'Á', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'Í', 'J', 'K', 'L', 'M', 'N', 'O', 'Ó', 'Ö', 'Ő', 'P', 'R', 'S', 'T', 'U', 'Ú', 'Ü', 'Ű', 'V', 'Z'];
+  const allLetters = ['a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'ö', 'ő', 'p', 'r', 's', 't', 'u', 'ú', 'ü', 'ű', 'v', 'z'];
   const wrongOptions = allLetters
     .filter(letter => letter !== wordItem.firstLetter)
     .sort(() => Math.random() - 0.5)
@@ -244,8 +373,11 @@ export const firstLetterQuestions: FirstLetterQuestion[] = WORDS.slice(0, 30).ma
   const options = [wordItem.firstLetter, ...wrongOptions].sort(() => Math.random() - 0.5);
   const correctIndex = options.indexOf(wordItem.firstLetter);
   
+  // Szóhoz tartozó emoji vagy placeholder
+  const emoji = WORD_EMOJI_MAP[wordItem.word] || '📷';
+  
   return {
-    image: '📷', // Placeholder - később valódi kép
+    image: emoji,
     word: wordItem.word,
     options: options,
     correctIndex: correctIndex,
@@ -255,12 +387,18 @@ export const firstLetterQuestions: FirstLetterQuestion[] = WORDS.slice(0, 30).ma
 /**
  * Véletlenszerű kérdések
  */
+import { getCurrentGrade } from '../../utils/gradeState';
+import { getRandomMissingLetterGrade2 } from '../../content/grade2/missingLetterData';
+
 export const getRandomWordPictureQuestion = (): WordPictureQuestion => {
   const randomIndex = Math.floor(Math.random() * wordPictureQuestions.length);
   return wordPictureQuestions[randomIndex];
 };
 
 export const getRandomMissingLetterQuestion = (): MissingLetterQuestion => {
+  if (getCurrentGrade() === 2) {
+    return getRandomMissingLetterGrade2();
+  }
   const randomIndex = Math.floor(Math.random() * missingLetterQuestions.length);
   return missingLetterQuestions[randomIndex];
 };

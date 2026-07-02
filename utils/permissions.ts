@@ -1,20 +1,14 @@
 /**
  * Permission handling
- * Mikrofon engedély kezelése
- * 
- * MEGJEGYZÉS: expo-av deprecated SDK 54-ben, de még működik.
- * A recording funkcióhoz továbbra is expo-av szükséges.
  */
 
-import { Audio } from 'expo-av';
 import { Platform, Alert, Linking } from 'react-native';
+import { isWeb } from './platform';
 
-/**
- * Mikrofon engedély kérése
- */
 export const requestMicrophonePermission = async (): Promise<boolean> => {
+  if (isWeb) return true;
   try {
-    // Audio engedély beállítása
+    const { Audio } = await import('expo-av');
     const { status } = await Audio.requestPermissionsAsync();
     
     if (status === 'granted') {
@@ -52,7 +46,9 @@ export const requestMicrophonePermission = async (): Promise<boolean> => {
  * Mikrofon engedély ellenőrzése
  */
 export const checkMicrophonePermission = async (): Promise<boolean> => {
+  if (isWeb) return true;
   try {
+    const { Audio } = await import('expo-av');
     const { status } = await Audio.getPermissionsAsync();
     return status === 'granted';
   } catch (error) {

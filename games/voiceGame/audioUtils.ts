@@ -30,8 +30,6 @@ export const playLetterOrWord = async (text: string): Promise<void> => {
     // Most csak egy placeholder - a valós implementációban
     // itt lenne a TTS hívás
     
-    console.log(`Playing: ${text}`);
-    
     // TODO: TTS implementáció hozzáadása
     // Példa: await Speech.speak(text, { language: 'hu-HU' });
     
@@ -60,7 +58,6 @@ export const startRecording = async (): Promise<void> => {
     );
     
     recording = newRecording;
-    console.log('Recording started');
   } catch (error) {
     console.error('Error starting recording:', error);
     throw error;
@@ -80,8 +77,6 @@ export const stopRecording = async (): Promise<Audio.RecordingStatus | null> => 
     const status = await recording.getStatusAsync();
     
     recording = null;
-    console.log('Recording stopped');
-    
     return status;
   } catch (error) {
     console.error('Error stopping recording:', error);

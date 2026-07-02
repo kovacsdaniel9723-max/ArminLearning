@@ -16,7 +16,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { colors, spacing, typography } from '../theme';
 import { FeedbackAnimation } from '../components/FeedbackAnimation';
-import { recordCorrectAnswer, recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
+import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
+import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
+import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import type { Reward } from '../rewards/rewards';
 
 // Word-Picture Matching
 import {
@@ -68,6 +71,9 @@ export const TextGameScreen: React.FC<TextGameScreenProps> = ({ route, navigatio
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpLevel, setLevelUpLevel] = useState(0);
+  const [levelUpReward, setLevelUpReward] = useState<Reward | undefined>(undefined);
 
   useEffect(() => {
     recordGamePlayed();
@@ -95,7 +101,12 @@ export const TextGameScreen: React.FC<TextGameScreenProps> = ({ route, navigatio
 
     if (result.isCorrect) {
       setFeedbackMessage('Nagyszerű! 🎉');
-      await recordCorrectAnswer();
+      const { leveledUp, newLevel, reward } = await recordCorrectAnswerAndCheckLevelUp();
+      if (leveledUp && newLevel != null) {
+        setLevelUpLevel(newLevel);
+        setLevelUpReward(reward);
+        setShowLevelUp(true);
+      }
       setShowFeedback(true);
       setGameState(result.newState);
 
@@ -233,6 +244,15 @@ export const TextGameScreen: React.FC<TextGameScreenProps> = ({ route, navigatio
           visible={showFeedback}
           message={feedbackMessage}
           type={showFeedback && feedbackMessage.includes('Nagyszerű') ? 'success' : 'encouragement'}
+        />
+        <LevelUpRocketScreen
+          visible={showLevelUp}
+          level={levelUpLevel}
+          reward={levelUpReward}
+          onClose={() => {
+          markLevelRewardSeen(levelUpLevel);
+          setShowLevelUp(false);
+        }}
         />
       </View>
     </SafeAreaView>

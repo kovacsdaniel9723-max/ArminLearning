@@ -49,10 +49,21 @@ export const loadNextQuestion = (state: MissingLetterGameState): MissingLetterGa
 /**
  * Hiányzó betűvel rendelkező szó formázása
  * 
- * MEGJEGYZÉS: A word már tartalmazza az aláhúzásokat (pl. "B_A", "C_C_A")
- * Ezért csak visszaadjuk a word-ot, esetleg formázva szóközökkel a jobb olvashatóságért
+ * A word mezőben a teljes szó van (pl. "béka"), és a missingIndex mutatja,
+ * hogy melyik betű hiányzik. Csak az adott indexű betűt cseréljük "_"-re.
  */
 export const formatWordWithMissingLetter = (question: MissingLetterQuestion): string => {
-  // A word már tartalmazza az aláhúzásokat, csak szóközöket adunk hozzá a jobb olvashatóságért
-  return question.word.split('').join(' ');
+  const word = question.word;
+  const missingIndex = question.missingIndex;
+  
+  // Szó karakterekre bontása (hogy az ékezetes betűk is helyesen működjenek)
+  const chars = Array.from(word);
+  
+  // Csak a hiányzó betű indexén cseréljük "_"-re
+  const maskedChars = chars.map((char, index) => 
+    index === missingIndex ? '_' : char
+  );
+  
+  // Szóközökkel elválasztva visszaadás (olvashatóságért)
+  return maskedChars.join(' ');
 };

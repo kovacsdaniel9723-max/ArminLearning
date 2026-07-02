@@ -8,12 +8,12 @@ import { getRandomHangmanWord } from './HangmanWordData';
 const MAX_WRONG_GUESSES = 12;
 
 const MAGYAR_BETUK = [
-  'A', 'Á', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'Í', 'J', 'K', 'L',
-  'M', 'N', 'O', 'Ó', 'Ö', 'Ő', 'P', 'R', 'S', 'T', 'U', 'Ú', 'Ü', 'Ű', 'V', 'Z',
+  'a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l',
+  'm', 'n', 'o', 'ó', 'ö', 'ő', 'p', 'r', 's', 't', 'u', 'ú', 'ü', 'ű', 'v', 'z',
 ];
 
 function hasEkezet(c: string): boolean {
-  return 'ÁÉÍÓÖŐÚÜŰ'.includes(c);
+  return 'áéíóöőúüű'.includes(c);
 }
 
 function nehezseg(c: string): number {
@@ -24,8 +24,8 @@ function nehezseg(c: string): number {
  * Csak a szó betűi + 4–6 véletlen, hasonló nehézségű betű
  */
 export function generateLetterOptions(word: string): string[] {
-  const upper = word.toUpperCase();
-  const wordSet = new Set(upper.split(''));
+  const normalized = word.toLowerCase().trim();
+  const wordSet = new Set(normalized.split(''));
   const wordLetters = [...wordSet];
   const wordNehezseg = wordLetters.reduce((s, c) => s + nehezseg(c), 0) / Math.max(1, wordLetters.length);
   const hasonlo = MAGYAR_BETUK.filter(
@@ -49,14 +49,14 @@ export const guessLetter = (
   state: HangmanState,
   letter: string
 ): HangmanState => {
-  const upper = letter.toUpperCase();
-  const inWord = state.word.includes(upper);
+  const normalized = letter.toLowerCase().trim();
+  const inWord = state.word.includes(normalized);
 
   if (inWord) {
-    if (state.guessedLetters.includes(upper)) return state;
+    if (state.guessedLetters.includes(normalized)) return state;
     return {
       ...state,
-      guessedLetters: [...state.guessedLetters, upper],
+      guessedLetters: [...state.guessedLetters, normalized],
     };
   }
 

@@ -10,6 +10,7 @@ const STORAGE_KEYS = {
   STATS: '@armin:stats',
   SETTINGS: '@armin:settings',
   LAST_PLAY_DATE: '@armin:lastPlayDate',
+  LAST_REWARDED_LEVEL: '@armin:lastRewardedLevel',
 } as const;
 
 /**
@@ -108,5 +109,33 @@ export const loadLastPlayDate = async (): Promise<Date | null> => {
   } catch (error) {
     console.error('Error loading last play date:', error);
     return null;
+  }
+};
+
+/**
+ * Utolsó megjelenített jutalom szint mentése (egyszer per szint)
+ */
+export const saveLastRewardedLevel = async (level: number): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEYS.LAST_REWARDED_LEVEL, String(level));
+  } catch (error) {
+    console.error('Error saving last rewarded level:', error);
+  }
+};
+
+/**
+ * Utolsó megjelenített jutalom szint betöltése
+ */
+export const loadLastRewardedLevel = async (): Promise<number> => {
+  try {
+    const data = await AsyncStorage.getItem(STORAGE_KEYS.LAST_REWARDED_LEVEL);
+    if (data) {
+      const n = parseInt(data, 10);
+      return isNaN(n) ? 0 : n;
+    }
+    return 0;
+  } catch (error) {
+    console.error('Error loading last rewarded level:', error);
+    return 0;
   }
 };

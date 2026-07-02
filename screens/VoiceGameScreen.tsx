@@ -34,7 +34,11 @@ import {
   cleanupAudio,
 } from '../games/voiceGame/audioUtils';
 import { requestMicrophonePermission, checkMicrophonePermission } from '../utils/permissions';
-import { recordCorrectAnswer, recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
+import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
+import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
+import { LevelUpRocketScreen } from '../components/LevelUpRocketScreen';
+import type { Reward } from '../rewards/rewards';
+import { isWeb } from '../utils/platform';
 
 type VoiceGameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'VoiceGame'>;
 
@@ -49,6 +53,9 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [recordingStartTime, setRecordingStartTime] = useState<number | null>(null);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpLevel, setLevelUpLevel] = useState(0);
+  const [levelUpReward, setLevelUpReward] = useState<Reward | undefined>(undefined);
 
   useEffect(() => {
     // Játék lejátszásának rögzítése
@@ -73,6 +80,12 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
   };
 
   const handleStartListening = async () => {
+    if (isWeb) {
+      setIsProcessing(true);
+      setGameState({ ...gameState, isListening: true });
+      setRecordingStartTime(Date.now());
+      return;
+    }
     if (!hasPermission) {
       const granted = await requestMicrophonePermission();
       if (!granted) {
@@ -95,17 +108,23 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
 
   const handleStopListening = async () => {
     try {
-      const status = await stopRecording();
-      const duration = recordingStartTime ? (Date.now() - recordingStartTime) / 1000 : 0;
-      
-      // Hang detektálás ellenőrzése (V1 - csak időtartam)
-      const soundDetected = checkSoundDetection(status, 0.5); // Minimum 0.5 másodperc
-      
+      let soundDetected = false;
+      if (isWeb) {
+        soundDetected = true;
+      } else {
+        const status = await stopRecording();
+        soundDetected = checkSoundDetection(status, 0.5);
+      }
       const { isCorrect, newState } = checkAnswer(gameState, soundDetected);
       
       if (isCorrect) {
         setFeedbackMessage('Nagyszerű! 🎉');
-        await recordCorrectAnswer();
+        const { leveledUp, newLevel, reward } = await recordCorrectAnswerAndCheckLevelUp();
+        if (leveledUp && newLevel != null) {
+          setLevelUpLevel(newLevel);
+          setLevelUpReward(reward);
+          setShowLevelUp(true);
+        }
       } else {
         // V1-ben mindig pozitív visszajelzést adunk
         setFeedbackMessage('Próbáld újra! 💪');
@@ -199,6 +218,15 @@ export const VoiceGameScreen: React.FC<VoiceGameScreenProps> = ({ navigation }) 
           visible={showFeedback}
           message={feedbackMessage}
           type={showFeedback && feedbackMessage.includes('Nagyszerű') ? 'success' : 'encouragement'}
+        />
+        <LevelUpRocketScreen
+          visible={showLevelUp}
+          level={levelUpLevel}
+          reward={levelUpReward}
+          onClose={() => {
+          markLevelRewardSeen(levelUpLevel);
+          setShowLevelUp(false);
+        }}
         />
       </View>
     </SafeAreaView>

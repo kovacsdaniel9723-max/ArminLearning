@@ -50,7 +50,7 @@ export const classicGameStyles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: spacing.lg,
     minHeight: 160,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.cardBackground,
     borderRadius: 24,
     borderWidth: 3,
     borderColor: colors.primary,
@@ -77,6 +77,13 @@ export const classicGameStyles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 6,
   },
+  heroText: {
+    ...typography.bodyLarge,
+    color: colors.text,
+    textAlign: 'center',
+    lineHeight: 30,
+    fontWeight: '600',
+  },
 
   optionsList: { gap: spacing.sm, marginTop: spacing.md },
   optionsGrid: {
@@ -88,16 +95,21 @@ export const classicGameStyles = StyleSheet.create({
   },
 
   optionBtn: {
-    backgroundColor: colors.cardBackground,
-    borderRadius: 16,
+    backgroundColor: colors.panelLight,
+    borderRadius: 18,
     padding: spacing.md,
     minHeight: spacing.touchTargetMin,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.primary,
-    borderBottomWidth: 4,
+    borderBottomWidth: 5,
     borderBottomColor: colors.primaryDark,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
   },
   optionBtnDisabled: { opacity: 0.4 },
   optionBtnUsed: {
@@ -107,23 +119,23 @@ export const classicGameStyles = StyleSheet.create({
   },
   optionText: {
     ...typography.h3,
-    color: colors.text,
-    fontWeight: '700',
+    color: colors.textOnLight,
+    fontWeight: '800',
     textAlign: 'center',
   },
   optionTextSmall: {
     ...typography.body,
-    color: colors.text,
-    fontWeight: '700',
+    color: colors.textOnLight,
+    fontWeight: '800',
     textAlign: 'center',
   },
 
   letterGridBtn: {
-    width: 52,
-    height: 52,
-    backgroundColor: colors.cardBackground,
+    width: 56,
+    height: 56,
+    backgroundColor: colors.panelLight,
     borderRadius: 14,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.primary,
     borderBottomWidth: 4,
     borderBottomColor: colors.primaryDark,
@@ -132,9 +144,9 @@ export const classicGameStyles = StyleSheet.create({
   },
   letterGridText: {
     ...typography.button,
-    fontSize: 22,
-    color: colors.primary,
-    fontWeight: '800',
+    fontSize: 24,
+    color: colors.textOnLight,
+    fontWeight: '900',
   },
 
   actionBtn: {

@@ -3,9 +3,9 @@
  * Fő entry point - React Navigation + osztályszint kontextus
  */
 
-import React from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View, StyleSheet, Text, TextInput, Platform } from 'react-native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -30,11 +30,44 @@ import { PatternGameScreen } from './screens/PatternGameScreen';
 import { MathGrade2Screen } from './screens/MathGrade2Screen';
 import { Grade2GameScreen } from './screens/Grade2GameScreen';
 import { getGrade2Game } from './games/grade2/registry';
+import { primeSoundSettings } from './utils/soundSettings';
+import { setCurrentGameId, routeToGameId } from './utils/currentGame';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+/** Web: alapértelmezett szövegszín (ne legyen fekete a sötét háttéren) */
+if (Platform.OS === 'web') {
+  const textDefault = { color: colors.text };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (Text as any).defaultProps = { ...(Text as any).defaultProps, style: textDefault };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (TextInput as any).defaultProps = {
+    ...(TextInput as any).defaultProps,
+    style: { color: colors.textOnLight },
+    placeholderTextColor: colors.textOnLightMuted,
+  };
+}
+
 function AppNavigator() {
   const { grade, isReady } = useGrade();
+  const navRef = useNavigationContainerRef<RootStackParamList>();
+
+  useEffect(() => {
+    primeSoundSettings();
+  }, []);
+
+  useEffect(() => {
+    if (!navRef.isReady()) return;
+    const syncRoute = () => {
+      const route = navRef.getCurrentRoute();
+      if (route) {
+        setCurrentGameId(routeToGameId(route.name, route.params as Record<string, unknown>));
+      }
+    };
+    syncRoute();
+    const unsub = navRef.addListener('state', syncRoute);
+    return unsub;
+  }, [navRef, isReady]);
 
   if (!isReady) {
     return (
@@ -45,7 +78,7 @@ function AppNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navRef}>
       <StatusBar style="light" />
       <Stack.Navigator
         initialRouteName={grade ? 'Home' : 'GradeSelection'}

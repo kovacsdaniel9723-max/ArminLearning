@@ -81,8 +81,9 @@ export const loadSettings = async (): Promise<ParentSettings | null> => {
  * Alapértelmezett beállítások
  */
 export const getDefaultSettings = (): ParentSettings => ({
-  dailyPlaytimeLimit: 600, // 10 perc
-  pin: '1234', // Hardcoded PIN
+  dailyPlaytimeLimit: 600,
+  pin: '1234',
+  soundEffectsEnabled: true,
 });
 
 /**

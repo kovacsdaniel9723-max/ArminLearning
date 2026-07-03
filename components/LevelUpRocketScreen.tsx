@@ -207,45 +207,49 @@ export const LevelUpRocketScreen: React.FC<LevelUpRocketScreenProps> = ({
             { opacity: titleOpacity, transform: [{ scale: titleScale }] },
           ]}
         >
-          <Text style={styles.badge}>⭐ szintlépés ⭐</Text>
+          <Text style={styles.badge}>🌟 szintlépés! 🌟</Text>
+          <Text style={styles.sparkleRow}>✨ ⭐ 🚀 ⭐ ✨</Text>
           <Animated.View style={[styles.levelRing, { opacity: glowPulse }, shadows.glow(colors.primary)]}>
             <Text style={styles.levelNum}>{level}</Text>
           </Animated.View>
-          <Text style={styles.title}>ügyes vagy, űrhajós!</Text>
-          <Text style={styles.subtitle}>elérted a {level}. szintet</Text>
+          <Text style={styles.title}>szuper, űrhajós!</Text>
+          <Text style={styles.subtitle}>felértél a {level}. szintre 🎉</Text>
         </Animated.View>
 
         <Animated.View style={[styles.rocketWrap, { transform: [{ translateY: rocketY }] }]}>
           <View style={styles.trail}>
-            {[0, 1, 2, 3].map((i) => (
-              <View key={i} style={[styles.trailDot, { opacity: 0.5 - i * 0.1, marginTop: i * 6 }]} />
+            {[0, 1, 2, 3, 4].map((i) => (
+              <View key={i} style={[styles.trailDot, { opacity: 0.7 - i * 0.12, marginTop: i * 5 }]} />
             ))}
           </View>
-          <Text style={styles.rocketEmoji}>🚀</Text>
+          <View style={styles.rocketBody}>
+            <Text style={styles.rocketEmoji}>🚀</Text>
+          </View>
           <Animated.View style={[styles.flameWrap, { transform: [{ scaleY: flameScale }] }]}>
-            <Text style={styles.flameEmoji}>🔥</Text>
+            <Text style={styles.flameEmoji}>🔥💨</Text>
           </Animated.View>
         </Animated.View>
 
         <View style={styles.planetRow}>
+          <Text style={styles.planetSmall}>🌙</Text>
           <Text style={styles.planet}>🪐</Text>
-          <Text style={styles.planetSmall}>🌍</Text>
+          <Text style={styles.planetSmall}>⭐</Text>
         </View>
 
         {!showReward && (
-          <TouchableOpacity style={styles.skipBtn} onPress={revealReward} activeOpacity={0.8}>
-            <Text style={styles.skipText}>ugrom a jutalomhoz →</Text>
+          <TouchableOpacity style={styles.skipBtn} onPress={revealReward} activeOpacity={0.85}>
+            <Text style={styles.skipText}>ugrom a jutalomhoz! →</Text>
           </TouchableOpacity>
         )}
 
         {showReward && (
           <Animated.View style={[styles.rewardCard, shadows.glow(colors.accent)]}>
-            <Text style={styles.rewardIcon}>🎁</Text>
+            <Text style={styles.rewardBurst}>🎊 🎁 🎊</Text>
             <Text style={styles.rewardLabel}>jutalom a {level}. szinten</Text>
             <Text style={styles.rewardDesc}>{rewardText}</Text>
-            <Text style={styles.parentNote}>a szülő adja oda a jutalmat</Text>
+            <Text style={styles.parentNote}>a szülő adja oda a jutalmat 💝</Text>
             <TouchableOpacity style={styles.ctaBtn} onPress={onClose} activeOpacity={0.85}>
-              <Text style={styles.ctaText}>tovább a küldetésekre →</Text>
+              <Text style={styles.ctaText}>tovább a küldetésekre! →</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
@@ -299,29 +303,36 @@ const styles = StyleSheet.create({
   badge: {
     ...typography.label,
     color: colors.secondary,
+    marginBottom: spacing.xs,
+    fontSize: 15,
+  },
+  sparkleRow: {
+    fontSize: 22,
     marginBottom: spacing.sm,
+    letterSpacing: 4,
   },
   levelRing: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    borderWidth: 4,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 5,
     borderColor: colors.primary,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.panelLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
   levelNum: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: '900',
-    color: colors.primary,
+    color: colors.textOnLight,
   },
   title: {
     ...typography.h1,
-    fontSize: 26,
+    fontSize: 30,
     color: colors.text,
     textAlign: 'center',
+    fontWeight: '900',
   },
   subtitle: {
     ...typography.bodyLarge,
@@ -343,14 +354,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: colors.accent,
   },
-  rocketEmoji: {
-    fontSize: 72,
+  rocketBody: {
+    backgroundColor: colors.panelLight,
+    borderRadius: 40,
+    padding: spacing.sm,
+    borderWidth: 3,
+    borderColor: colors.primary,
     ...(Platform.OS === 'web'
-      ? { textShadow: '0 0 24px rgba(0,212,255,0.8)' } as object
+      ? { boxShadow: '0 0 32px rgba(0,212,255,0.6)' } as object
+      : shadows.glow(colors.primary)),
+  },
+  rocketEmoji: {
+    fontSize: 88,
+    ...(Platform.OS === 'web'
+      ? { textShadow: '0 0 28px rgba(0,212,255,0.9)' } as object
       : {}),
   },
-  flameWrap: { marginTop: -8 },
-  flameEmoji: { fontSize: 36 },
+  flameWrap: { marginTop: -4 },
+  flameEmoji: { fontSize: 40 },
   planetRow: {
     position: 'absolute',
     bottom: H * 0.12,
@@ -367,44 +388,50 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: H * 0.06,
     alignSelf: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
     zIndex: 10,
+    backgroundColor: colors.cardBackground,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   skipText: {
-    ...typography.body,
-    color: colors.textLight,
-    fontWeight: '700',
+    ...typography.button,
+    color: colors.primary,
+    fontWeight: '800',
   },
   rewardCard: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: colors.cardBackground,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    borderWidth: 2,
+    backgroundColor: colors.panelLight,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    borderWidth: 4,
     borderColor: colors.accent,
+    borderBottomWidth: 0,
     padding: spacing.xl,
-    paddingBottom: spacing.xxl + 12,
+    paddingBottom: spacing.xxl + 16,
     alignItems: 'center',
   },
-  rewardIcon: { fontSize: 48, marginBottom: spacing.sm },
+  rewardBurst: { fontSize: 36, marginBottom: spacing.sm, letterSpacing: 6 },
   rewardLabel: {
     ...typography.label,
-    color: colors.accent,
+    color: colors.accentDark,
     marginBottom: spacing.xs,
   },
   rewardDesc: {
-    ...typography.h3,
-    color: colors.primary,
+    ...typography.h2,
+    color: colors.textOnLight,
     textAlign: 'center',
     marginBottom: spacing.sm,
+    fontWeight: '800',
   },
   parentNote: {
     ...typography.bodySmall,
-    color: colors.textLight,
+    color: colors.textOnLightMuted,
     fontStyle: 'italic',
     marginBottom: spacing.lg,
   },

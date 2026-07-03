@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, typography } from '../../theme';
 import { ScreenBackground } from '../ScreenBackground';
 import { FeedbackAnimation } from '../FeedbackAnimation';
+import { XpStarBurst } from '../XpStarBurst';
 import { LevelUpRocketScreen } from '../LevelUpRocketScreen';
 import { MovementBreakModal } from './MovementBreakModal';
 import { GameBackButton } from '../navigation/GameBackButton';
@@ -85,6 +86,7 @@ export const GameSessionLayout: React.FC<GameSessionLayoutProps> = ({
       <SafeAreaView style={styles.container}>
         {body}
         <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={feedbackType} />
+        <XpStarBurst visible={showFeedback && feedbackType === 'success'} />
         <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={onCloseLevelUp} />
         <MovementBreakModal
           visible={showMovement}

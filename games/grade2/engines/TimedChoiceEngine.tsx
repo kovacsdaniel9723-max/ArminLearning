@@ -63,7 +63,9 @@ export const TimedChoiceEngine: React.FC<TimedChoiceEngineProps> = ({
       onMovementSkip={() => session.skipMovement(next)}
     >
       {q.subtitle ? <Text style={g2.subtitle}>{q.subtitle}</Text> : null}
-      <Text style={g2.prompt}>{q.prompt}</Text>
+      <View style={g2.promptBanner}>
+        <Text style={g2.prompt}>{q.prompt}</Text>
+      </View>
       <View style={styles.grid}>
         {q.options.map((opt, i) => (
           <TouchableOpacity key={i} style={g2.option} onPress={() => onPick(i)} disabled={session.isProcessing}>

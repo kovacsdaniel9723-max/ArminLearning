@@ -7,11 +7,8 @@ import { View, Text } from 'react-native';
 import { getRandomReadingTask, type ReadingTask } from '../content/grade2/readingData';
 import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
-import {
-  ClassicGameLayout,
-  GameHeroBox,
-  GameOptionButton,
-} from '../components/game/ClassicGameLayout';
+import { SpeakButton } from '../components/SpeakButton';
+import { ClassicGameLayout, GameHeroBox, GameOptionButton } from '../components/game/ClassicGameLayout';
 import { classicGameStyles as gs } from '../theme/classicGameStyles';
 import type { Reward } from '../rewards/rewards';
 
@@ -68,8 +65,9 @@ export const ReadingGameScreen: React.FC = () => {
       onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
     >
       <GameHeroBox>
-        <Text style={[gs.optionText, { fontSize: 18, lineHeight: 28 }]}>{task.sentence}</Text>
+        <Text style={gs.heroText}>{task.sentence}</Text>
       </GameHeroBox>
+      <SpeakButton text={`${task.sentence} ${task.question}`} />
       <Text style={gs.prompt}>{task.question}</Text>
       <View style={gs.optionsList}>
         {task.options.map((opt, i) => (

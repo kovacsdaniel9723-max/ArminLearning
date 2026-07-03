@@ -34,6 +34,7 @@ import {
   DrawingEngine,
   CollageEngine,
 } from './engines/CreativeEngines';
+import { RimVadaszEngine, PenzermeEngine, SzorzotablaEngine } from './engines/ExtraGamesEngines';
 
 export type Grade2Subject =
   | 'magyar'
@@ -69,6 +70,7 @@ export const GRADE2_REGISTRY: Grade2GameDef[] = [
   { id: 'szofajSzafari', title: 'szófaj-szafari', description: 'rendezd a szavakat!', icon: '🌴', subject: 'magyar', component: WordTypeSafariEngine },
   { id: 'mondatfajtaMemoria', title: 'mondatfajta memória', description: 'párosítsd a mondatot!', icon: '🧠', subject: 'magyar', component: MemoryTypeEngine },
   { id: 'fogalmazasEpito', title: 'fogalmazás-építő', description: 'építs mini-történetet!', icon: '✍️', subject: 'magyar', component: ScaffoldEngine },
+  { id: 'rimVadasz', title: 'rím-vadász', description: 'melyik szó rímelt?', icon: '🎵', subject: 'magyar', component: RimVadaszEngine },
   { id: 'szorzoUgras', title: 'szorzó-ugrás', description: 'ugrálj a számsoron!', icon: '🦘', subject: 'matematika', component: NumberLineEngine },
   { id: 'osztoParti', title: 'osztó-parti', description: 'oszd el egyenlően!', icon: '🎉', subject: 'matematika', component: SharingEngine },
   { id: 'vasarlosJatek', title: 'vásárlós játék', description: 'számold a visszajárót!', icon: '🛒', subject: 'matematika', component: ShoppingEngine },
@@ -76,6 +78,8 @@ export const GRADE2_REGISTRY: Grade2GameDef[] = [
   { id: 'szovegesFeladat', title: 'szöveges feladat nyomozó', description: 'oldd meg képekkel!', icon: '🔎', subject: 'matematika', component: WordProblemEngine },
   { id: 'alakzatVadasz', title: 'alakzat-vadászat', description: 'keresd meg az alakzatot!', icon: '🔺', subject: 'matematika', component: ShapeHuntEngine },
   { id: 'meromester', title: 'mérőmester', description: 'mérj centiméterben!', icon: '📏', subject: 'matematika', component: MeasureEngine },
+  { id: 'penzerme', title: 'pénzérmék', description: 'számold össze az érméket!', icon: '🪙', subject: 'matematika', component: PenzermeEngine },
+  { id: 'szorzotabla', title: 'szorzótábla', description: '2×, 5×, 10× gyakorló!', icon: '✖️', subject: 'matematika', component: SzorzotablaEngine },
   { id: 'evszakForgo', title: 'évszak-forgó', description: 'párosítsd az évszakot!', icon: '🌀', subject: 'kornyezet', component: SeasonSpinEngine },
   { id: 'allatCsoport', title: 'állat-csoportosító', description: 'rendezd az állatokat!', icon: '🦁', subject: 'kornyezet', component: AnimalSortEngine },
   { id: 'testreszKvíz', title: 'testrész-kvíz', description: 'nevezd meg a testrészt!', icon: '🙂', subject: 'kornyezet', component: BodyLabelEngine },

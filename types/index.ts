@@ -59,8 +59,9 @@ export interface GameStats {
 
 // Szülői beállítások
 export interface ParentSettings {
-  dailyPlaytimeLimit: number; // másodpercekben (pl. 600 = 10 perc)
-  pin: string; // hardcoded PIN
+  dailyPlaytimeLimit: number;
+  pin: string;
+  soundEffectsEnabled: boolean;
 }
 
 // Navigáció

@@ -2,13 +2,15 @@
  * Klasszikus játék képernyő keret – űr téma, vissza, pontszám, visszajelzés
  */
 
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenBackground } from '../ScreenBackground';
 import { GameBackButton } from '../navigation/GameBackButton';
 import { FeedbackAnimation } from '../FeedbackAnimation';
+import { XpStarBurst } from '../XpStarBurst';
 import { LevelUpRocketScreen } from '../LevelUpRocketScreen';
+import { playClickSound } from '../../utils/gameSounds';
 import { spacing } from '../../theme';
 import { classicGameStyles as gs } from '../../theme/classicGameStyles';
 import type { Reward } from '../../rewards/rewards';
@@ -81,6 +83,7 @@ export const ClassicGameLayout: React.FC<ClassicGameLayoutProps> = ({
       <SafeAreaView style={gs.container}>
         {body}
         <FeedbackAnimation visible={showFeedback} message={feedbackMessage} type={isSuccess ? 'success' : 'encouragement'} />
+        <XpStarBurst visible={showFeedback && isSuccess} />
         <LevelUpRocketScreen visible={showLevelUp} level={levelUpLevel} reward={levelUpReward} onClose={onCloseLevelUp} />
       </SafeAreaView>
     </ScreenBackground>
@@ -98,16 +101,29 @@ export const GameOptionButton: React.FC<{
   used?: boolean;
   small?: boolean;
   children?: React.ReactNode;
-}> = ({ label, onPress, disabled, used, small, children }) => (
+}> = ({ label, onPress, disabled, used, small, children }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+  const press = () => {
+    playClickSound();
+    Animated.sequence([
+      Animated.timing(scale, { toValue: 0.92, duration: 80, useNativeDriver: true }),
+      Animated.spring(scale, { toValue: 1, friction: 4, useNativeDriver: true }),
+    ]).start();
+    onPress();
+  };
+  return (
   <TouchableOpacity
     style={[gs.optionBtn, used && gs.optionBtnUsed, disabled && gs.optionBtnDisabled]}
-    onPress={onPress}
+    onPress={press}
     disabled={disabled || used}
     activeOpacity={0.85}
   >
+    <Animated.View style={{ transform: [{ scale }], alignItems: 'center' }}>
     {children ?? (label ? <Text style={small ? gs.optionTextSmall : gs.optionText}>{label}</Text> : null)}
+    </Animated.View>
   </TouchableOpacity>
-);
+  );
+};
 
 export const GameActionButton: React.FC<{
   label: string;

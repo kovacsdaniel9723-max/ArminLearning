@@ -11,6 +11,8 @@ import {
   ensureGradeStats,
 } from './gradeStorage';
 import { loadLastPlayDate, saveLastPlayDate } from './storage';
+import { getCurrentGameId } from './currentGame';
+import { markDailyMissionDone } from './dailyMission';
 
 const resetDailyStatsIfNeeded = async (stats: GameStats): Promise<GameStats> => {
   const lastPlayDate = await loadLastPlayDate();
@@ -58,6 +60,8 @@ export const recordCorrectAnswer = async (): Promise<GameStats> => {
   stats.correctAnswers += 1;
   stats.totalAnswers += 1;
   await saveStatsForGrade(grade, stats);
+  const gid = getCurrentGameId();
+  if (gid) void markDailyMissionDone(gid);
   return stats;
 };
 

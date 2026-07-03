@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   chip: { minWidth: 88 },
   chipSel: {
     borderColor: colors.accent,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.panelLightWarm,
     borderBottomColor: colors.accentDark,
   },
   chipDone: { opacity: 0.35 },

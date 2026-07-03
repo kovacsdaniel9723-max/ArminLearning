@@ -14,13 +14,20 @@ export const colors = {
   secondaryDark: '#4AE038',
 
   accent: '#FF6B2C',
-  accentLight: '#252035',
+  accentLight: '#FF9A5C',
   accentDark: '#E85D04',
+  accentMuted: '#3D2818',
 
   // Űr háttér
   background: '#0B1020',
   backgroundLight: '#151B2E',
   backgroundDark: '#060910',
+
+  // Világos panelek – válaszgombok (jó kontraszt a sötét űrön)
+  panelLight: '#EEF4FF',
+  panelLightWarm: '#FFF6E8',
+  textOnLight: '#0F1A33',
+  textOnLightMuted: '#3D4F6F',
 
   // Szöveg – világos a sötét háttéren
   text: '#F0F4FF',

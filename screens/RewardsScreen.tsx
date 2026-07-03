@@ -160,10 +160,11 @@ const styles = StyleSheet.create({
   },
   rewardCardCurrent: {
     borderColor: colors.accent,
-    backgroundColor: colors.accentLight,
+    borderWidth: 3,
+    backgroundColor: colors.panelLightWarm,
   },
-  rewardCardIcon: { fontSize: 32, marginBottom: spacing.xs },
-  rewardCardLevel: { ...typography.body, fontWeight: '800', color: colors.primary },
-  rewardCardDesc: { ...typography.bodySmall, color: colors.textLight, textAlign: 'center', marginTop: spacing.xs },
+  rewardCardIcon: { fontSize: 36, marginBottom: spacing.xs },
+  rewardCardLevel: { ...typography.body, fontWeight: '800', color: colors.textOnLight },
+  rewardCardDesc: { ...typography.bodySmall, color: colors.textOnLightMuted, textAlign: 'center', marginTop: spacing.xs },
   hint: { ...typography.bodySmall, color: colors.textLight, textAlign: 'center', marginTop: spacing.md, fontStyle: 'italic' },
 });

@@ -7,7 +7,7 @@
     "dev": "expo start --web",
     "build": "expo export -p web",
     "build:web": "expo export -p web",
-    "test": "node __tests__/rewardLogic.test.js && node __tests__/magyarData.test.js && node __tests__/roundOptions.test.js"
+    "test": "node __tests__/rewardLogic.test.js && node __tests__/magyarData.test.js && node __tests__/roundOptions.test.js && node __tests__/extraGamesData.test.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

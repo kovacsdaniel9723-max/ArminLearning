@@ -5,6 +5,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet, Animated, Easing } from 'react-native';
 import { colors, spacing, typography, shadows } from '../theme';
+import { playCorrectSound, playWrongSound } from '../utils/gameSounds';
 
 interface FeedbackAnimationProps {
   visible: boolean;
@@ -24,6 +25,8 @@ export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
 
   useEffect(() => {
     if (visible) {
+      if (type === 'success') playCorrectSound();
+      else playWrongSound();
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
@@ -64,6 +67,7 @@ export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
 
   const emoji = type === 'success' ? '🔥' : '💪';
   const borderColor = type === 'success' ? colors.secondary : colors.accent;
+  const msgColor = type === 'success' ? colors.textOnLight : colors.textOnLight;
 
   return (
     <Animated.View
@@ -78,7 +82,7 @@ export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
       ]}
     >
       <Text style={styles.emoji}>{emoji}</Text>
-      <Text style={[styles.message, { color: borderColor }]}>{message}</Text>
+      <Text style={[styles.message, { color: msgColor }]}>{message}</Text>
     </Animated.View>
   );
 };
@@ -86,16 +90,16 @@ export const FeedbackAnimation: React.FC<FeedbackAnimationProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: '38%',
+    top: '36%',
     alignSelf: 'center',
-    width: 240,
-    backgroundColor: colors.cardBackground,
-    borderRadius: 20,
-    padding: spacing.lg,
+    width: 280,
+    backgroundColor: colors.panelLight,
+    borderRadius: 24,
+    padding: spacing.xl,
     alignItems: 'center',
-    borderWidth: 3,
+    borderWidth: 4,
     zIndex: 1000,
   },
-  emoji: { fontSize: 56, marginBottom: spacing.sm },
-  message: { ...typography.h3, textAlign: 'center' },
+  emoji: { fontSize: 64, marginBottom: spacing.sm },
+  message: { ...typography.h2, textAlign: 'center', fontWeight: '900' },
 });

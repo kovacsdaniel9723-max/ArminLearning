@@ -12,6 +12,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -27,6 +28,7 @@ import {
 } from '../utils/storage';
 import { initializeStats } from '../utils/stats';
 import { ParentSettings, GameStats } from '../types';
+import { setSoundEnabled } from '../utils/soundSettings';
 
 type ParentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Parent'>;
 
@@ -50,8 +52,9 @@ export const ParentScreen: React.FC<ParentScreenProps> = ({ navigation }) => {
   const loadInitialData = async () => {
     const loadedSettings = await loadSettings();
     if (loadedSettings) {
-      setSettings(loadedSettings);
+      setSettings({ ...getDefaultSettings(), ...loadedSettings });
       setPlaytimeLimit((loadedSettings.dailyPlaytimeLimit / 60).toString());
+      void setSoundEnabled(loadedSettings.soundEffectsEnabled ?? true);
     }
 
     const loadedStats = await initializeStats();
@@ -77,10 +80,11 @@ export const ParentScreen: React.FC<ParentScreenProps> = ({ navigation }) => {
 
     const newSettings: ParentSettings = {
       ...settings,
-      dailyPlaytimeLimit: limitMinutes * 60, // másodpercekben
+      dailyPlaytimeLimit: limitMinutes * 60,
     };
 
     await saveSettings(newSettings);
+    await setSoundEnabled(newSettings.soundEffectsEnabled);
     setSettings(newSettings);
     Alert.alert('Sikeres', 'Beállítások mentve!');
   };
@@ -169,6 +173,16 @@ export const ParentScreen: React.FC<ParentScreenProps> = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Beállítások</Text>
           
           <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>hangeffektek:</Text>
+            <Switch
+              value={settings.soundEffectsEnabled}
+              onValueChange={(v) => setSettings((s) => ({ ...s, soundEffectsEnabled: v }))}
+              trackColor={{ false: colors.grayLight, true: colors.primary }}
+              thumbColor={settings.soundEffectsEnabled ? colors.secondary : colors.gray}
+            />
+          </View>
+
+          <View style={styles.settingRow}>
             <Text style={styles.settingLabel}>Napi játékidő limit (perc):</Text>
             <TextInput
               style={styles.settingInput}
@@ -230,13 +244,14 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 200,
     height: spacing.buttonHeight,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.primary,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: spacing.md,
     ...typography.button,
     textAlign: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.panelLight,
+    color: colors.textOnLight,
     marginBottom: spacing.lg,
   },
   authButton: {
@@ -283,6 +298,9 @@ const styles = StyleSheet.create({
   },
   settingRow: {
     marginBottom: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   settingLabel: {
     ...typography.body,
@@ -291,12 +309,13 @@ const styles = StyleSheet.create({
   },
   settingInput: {
     height: spacing.buttonHeight,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.primary,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: spacing.md,
     ...typography.body,
-    backgroundColor: colors.white,
+    backgroundColor: colors.panelLight,
+    color: colors.textOnLight,
   },
   saveButton: {
     marginTop: spacing.md,

@@ -12,6 +12,7 @@ import {
   GameActionButton,
 } from '../../components/game/ClassicGameLayout';
 import { classicGameStyles as gs } from '../../theme/classicGameStyles';
+import { colors } from '../../theme';
 import { RobotProgress } from './RobotProgress';
 import {
   startNewGame,
@@ -153,7 +154,7 @@ export const HangmanGameScreen: React.FC<Props> = () => {
                   disabled={used}
                   activeOpacity={0.85}
                 >
-                  <Text style={[gs.letterGridText, used && { color: '#888' }]}>{letter}</Text>
+                  <Text style={[gs.letterGridText, used && { color: colors.textOnLightMuted }]}>{letter}</Text>
                 </TouchableOpacity>
               );
             })}

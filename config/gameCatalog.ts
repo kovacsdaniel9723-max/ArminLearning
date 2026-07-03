@@ -40,6 +40,7 @@ const GRADE2_GAMES: GameCatalogEntry[] = [
   { id: 'szofajSzafari', title: 'szófaj-szafari', description: 'rendezd a szavakat!', icon: '🌴', screen: 'Grade2Game', params: { gameId: 'szofajSzafari' }, subject: 'magyar' },
   { id: 'mondatfajtaMemoria', title: 'mondatfajta memória', description: 'párosítsd a mondatot!', icon: '🧠', screen: 'Grade2Game', params: { gameId: 'mondatfajtaMemoria' }, subject: 'magyar' },
   { id: 'fogalmazasEpito', title: 'fogalmazás-építő', description: 'építs mini-történetet!', icon: '✍️', screen: 'Grade2Game', params: { gameId: 'fogalmazasEpito' }, subject: 'magyar' },
+  { id: 'rimVadasz', title: 'rím-vadász', description: 'melyik szó rímelt?', icon: '🎵', screen: 'Grade2Game', params: { gameId: 'rimVadasz' }, subject: 'magyar' },
   { id: 'missingLetter', title: 'hiányzó betű', description: 'hosszabb szavak!', icon: '✏️', screen: 'TextGame', params: { gameType: 'missingLetter' }, subject: 'magyar' },
   { id: 'hangman', title: 'építsük meg a robotot!', description: 'nehézebb szavak!', icon: '🤖', screen: 'HangmanGame', subject: 'magyar' },
   { id: 'voice', title: 'mondd ki hangosan!', description: 'mondatok hangosan!', icon: '🎤', screen: 'VoiceGame', subject: 'magyar' },
@@ -54,6 +55,8 @@ const GRADE2_GAMES: GameCatalogEntry[] = [
   { id: 'szovegesFeladat', title: 'szöveges feladat nyomozó', description: 'oldd meg képekkel!', icon: '🔎', screen: 'Grade2Game', params: { gameId: 'szovegesFeladat' }, subject: 'matematika' },
   { id: 'alakzatVadasz', title: 'alakzat-vadászat', description: 'keresd meg az alakzatot!', icon: '🔺', screen: 'Grade2Game', params: { gameId: 'alakzatVadasz' }, subject: 'matematika' },
   { id: 'meromester', title: 'mérőmester', description: 'mérj centiméterben!', icon: '📏', screen: 'Grade2Game', params: { gameId: 'meromester' }, subject: 'matematika' },
+  { id: 'penzerme', title: 'pénzérmék', description: 'számold össze az érméket!', icon: '🪙', screen: 'Grade2Game', params: { gameId: 'penzerme' }, subject: 'matematika' },
+  { id: 'szorzotabla', title: 'szorzótábla', description: '2×, 5×, 10× gyakorló!', icon: '✖️', screen: 'Grade2Game', params: { gameId: 'szorzotabla' }, subject: 'matematika' },
   // Környezet
   { id: 'evszakForgo', title: 'évszak-forgó', description: 'párosítsd az évszakot!', icon: '🌀', screen: 'Grade2Game', params: { gameId: 'evszakForgo' }, subject: 'kornyezet' },
   { id: 'allatCsoport', title: 'állat-csoportosító', description: 'rendezd az állatokat!', icon: '🦁', screen: 'Grade2Game', params: { gameId: 'allatCsoport' }, subject: 'kornyezet' },

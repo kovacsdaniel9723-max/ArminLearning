@@ -8,6 +8,7 @@ import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { colors, spacing, typography } from '../../../theme';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
+import { SpeakButton } from '../../../components/SpeakButton';
 import { pickStoryQuiz } from '../../../content/grade2/magyarData';
 
 export const StoryQuizEngine: React.FC = () => {
@@ -43,9 +44,10 @@ export const StoryQuizEngine: React.FC = () => {
       onMovementComplete={() => session.completeMovement(reset)}
       onMovementSkip={() => session.skipMovement(reset)}
     >
-      <View style={styles.storyBox}>
+      <View style={g2.promptBanner}>
         <Text style={styles.story}>{data.story}</Text>
       </View>
+      <SpeakButton text={data.story} />
       <Text style={g2.prompt}>{q.q}</Text>
       <View style={styles.grid}>
         {q.options.map((opt, i) => (
@@ -60,8 +62,7 @@ export const StoryQuizEngine: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  storyBox: { backgroundColor: colors.backgroundLight, padding: spacing.md, borderRadius: 16, marginBottom: spacing.md, borderWidth: 2, borderColor: colors.cardBorder },
-  story: { ...typography.bodyLarge, color: colors.text, lineHeight: 28 },
+  story: { ...typography.bodyLarge, color: colors.text, lineHeight: 30, fontWeight: '600' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
-  emoji: { fontSize: 40 },
+  emoji: { fontSize: 44 },
 });

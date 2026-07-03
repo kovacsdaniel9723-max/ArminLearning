@@ -7,7 +7,7 @@ import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import type { Reward } from '../rewards/rewards';
 import { pickMovementChallenge } from '../content/grade2/testnevData';
-import { primeCelebrationAudio } from '../utils/celebrationSound';
+import { primeGameAudio, playStreakSound, playTimerTickSound } from '../utils/gameSounds';
 
 export interface GameSessionOptions {
   roundSeconds?: number;
@@ -41,9 +41,19 @@ export function useGameSession(options: GameSessionOptions = {}) {
   const onRoundTimeoutRef = useRef(options.onRoundTimeout);
   onRoundTimeoutRef.current = options.onRoundTimeout;
 
+  const lastTickRef = useRef(-1);
+
   useEffect(() => {
     recordGamePlayed();
   }, []);
+
+  useEffect(() => {
+    if (timeLeft > 0 && timeLeft <= 5 && timeLeft !== lastTickRef.current && !isProcessing && !showMovement && !showLevelUp) {
+      lastTickRef.current = timeLeft;
+      playTimerTickSound();
+    }
+    if (timeLeft > 5) lastTickRef.current = -1;
+  }, [timeLeft, isProcessing, showMovement, showLevelUp]);
 
   const resetTimer = useCallback(() => {
     setTimeLeft(roundSeconds);
@@ -99,9 +109,13 @@ export function useGameSession(options: GameSessionOptions = {}) {
   }, [movementEnabled, movementEvery]);
 
   const handleCorrect = useCallback(async (onAfter?: () => void) => {
-    primeCelebrationAudio();
+    primeGameAudio();
     setIsProcessing(true);
-    setStreak((s) => s + 1);
+    setStreak((s) => {
+      const next = s + 1;
+      if (next >= 3 && next % 3 === 0) playStreakSound();
+      return next;
+    });
     showSuccess();
     const { leveledUp, newLevel, reward } = await recordCorrectAnswerAndCheckLevelUp();
     if (leveledUp && newLevel != null) {

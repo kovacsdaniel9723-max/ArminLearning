@@ -270,7 +270,9 @@ export const WordProblemEngine: React.FC = () => {
       onMovementSkip={() => session.skipMovement(reset)}
     >
       <Text style={styles.bigEmoji}>{task.icons.repeat(Math.min(task.a, 8))}</Text>
-      <Text style={styles.story}>{task.text}</Text>
+      <View style={g2.promptBanner}>
+        <Text style={styles.story}>{task.text}</Text>
+      </View>
       <Text style={styles.sub}>mennyi a válasz?</Text>
       <OptionGrid options={unique} onPick={onPick} disabled={session.isProcessing} />
     </GameSessionLayout>
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
   line: { ...typography.h2, textAlign: 'center', color: colors.primary, marginBottom: spacing.sm },
   bigEmoji: { fontSize: 48, textAlign: 'center', marginBottom: spacing.md },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
-  shapeBtn: { padding: spacing.md, backgroundColor: colors.cardBackground, borderRadius: 16, borderWidth: 2, borderColor: colors.primary },
+  shapeBtn: { padding: spacing.md, backgroundColor: colors.panelLight, borderRadius: 18, borderWidth: 3, borderColor: colors.primary, borderBottomWidth: 4, borderBottomColor: colors.primaryDark },
   shapeEmoji: { fontSize: 48 },
   rulerText: { ...typography.body, fontFamily: 'monospace', color: colors.primary, fontWeight: '700' },
 });

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Armin Learning",
     "slug": "armin-learning-app",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "experiments": {

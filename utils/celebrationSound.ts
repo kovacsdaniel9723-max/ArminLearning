@@ -3,11 +3,12 @@
  */
 
 import { isWeb } from './platform';
+import { isSoundEnabledSync } from './soundSettings';
 
 let sharedCtx: AudioContext | null = null;
 
 async function getAudioContext(): Promise<AudioContext | null> {
-  if (!isWeb || typeof window === 'undefined') return null;
+  if (!isWeb || typeof window === 'undefined' || !isSoundEnabledSync()) return null;
   try {
     const Ctx =
       window.AudioContext ||

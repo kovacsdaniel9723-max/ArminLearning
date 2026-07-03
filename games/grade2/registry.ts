@@ -85,7 +85,7 @@ export const GRADE2_REGISTRY: Grade2GameDef[] = [
   { id: 'testreszKvíz', title: 'testrész-kvíz', description: 'nevezd meg a testrészt!', icon: '🙂', subject: 'kornyezet', component: BodyLabelEngine },
   { id: 'kozlekedesLampa', title: 'közlekedés-lámpa', description: 'biztonságosan az úton!', icon: '🚦', subject: 'kornyezet', component: TrafficLightEngine },
   { id: 'egeszsegValaszto', title: 'egészség-választó', description: 'mi az egészséges?', icon: '🥗', subject: 'kornyezet', component: HealthSortEngine },
-  { id: 'alkotoSzoba', title: 'alkotó szoba', description: 'rajzolj és színezz!', icon: '🎨', subject: 'rajz', component: DrawingEngine },
+  { id: 'alkotoSzoba', title: 'alkotó szoba', description: 'paint-szerű rajzolás feladatokkal!', icon: '🎨', subject: 'rajz', component: DrawingEngine },
   { id: 'formaKollazs', title: 'forma-kollázs', description: 'építs képet alakzatokból!', icon: '🧩', subject: 'rajz', component: CollageEngine },
   { id: 'ritmusKopogo', title: 'ritmus-kopogó', description: 'kövesd a ritmust!', icon: '🥁', subject: 'zene', component: RhythmEngine },
   { id: 'hangfelismero', title: 'hangfelismerő', description: 'melyik hang ez?', icon: '👂', subject: 'zene', component: SoundPickEngine },

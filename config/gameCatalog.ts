@@ -64,7 +64,7 @@ const GRADE2_GAMES: GameCatalogEntry[] = [
   { id: 'kozlekedesLampa', title: 'közlekedés-lámpa', description: 'biztonságosan az úton!', icon: '🚦', screen: 'Grade2Game', params: { gameId: 'kozlekedesLampa' }, subject: 'kornyezet' },
   { id: 'egeszsegValaszto', title: 'egészség-választó', description: 'mi az egészséges?', icon: '🥗', screen: 'Grade2Game', params: { gameId: 'egeszsegValaszto' }, subject: 'kornyezet' },
   // Rajz
-  { id: 'alkotoSzoba', title: 'alkotó szoba', description: 'rajzolj és színezz!', icon: '🎨', screen: 'Grade2Game', params: { gameId: 'alkotoSzoba' }, subject: 'rajz' },
+  { id: 'alkotoSzoba', title: 'alkotó szoba', description: 'paint-szerű rajzolás feladatokkal!', icon: '🎨', screen: 'Grade2Game', params: { gameId: 'alkotoSzoba' }, subject: 'rajz' },
   { id: 'formaKollazs', title: 'forma-kollázs', description: 'építs képet alakzatokból!', icon: '🧩', screen: 'Grade2Game', params: { gameId: 'formaKollazs' }, subject: 'rajz' },
   // Zene
   { id: 'ritmusKopogo', title: 'ritmus-kopogó', description: 'kövesd a ritmust!', icon: '🥁', screen: 'Grade2Game', params: { gameId: 'ritmusKopogo' }, subject: 'zene' },

@@ -2,22 +2,29 @@
  * Zene, rajz, digitális, testnevelés játékmotorok
  */
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Circle, Rect, Polygon } from 'react-native-svg';
 import * as Speech from 'expo-speech';
 import { colors, spacing, typography } from '../../../theme';
 import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
+import { SpeakButton } from '../../../components/SpeakButton';
+import { PaintCanvas, type PaintCanvasHandle } from '../../../components/PaintCanvas';
 import { pickRhythmPattern, pickSoundTask, pickDanceSequence } from '../../../content/grade2/zeneData';
-import { pickNetSafetyStep, DRAWING_COLORS, DRAWING_STAMPS, COLLAGE_SHAPES } from '../../../content/grade2/digitalisData';
+import { pickNetSafetyStep, DRAWING_COLORS, COLLAGE_SHAPES } from '../../../content/grade2/digitalisData';
+import { pickDrawingTask } from '../../../content/grade2/drawingTasksData';
 import { pickCoordinationPatternShuffled } from '../../../content/grade2/testnevData';
 import { pickPunctuationTask, pickSortWords, SZOFAJ_CATEGORIES } from '../../../content/grade2/magyarData';
 import { SortBasketEngine, type SortItem } from './SortBasketEngine';
 import { TimedChoiceEngine } from './TimedChoiceEngine';
 
-const { width: SCREEN_W } = Dimensions.get('window');
+const BRUSH_SIZES = [
+  { label: 'vékony', size: 4 },
+  { label: 'közepes', size: 10 },
+  { label: 'vastag', size: 18 },
+];
 
 export const PunctuationEngine: React.FC = () => (
   <TimedChoiceEngine
@@ -284,64 +291,103 @@ export const NetSafetyEngine: React.FC = () => {
   );
 };
 
-interface DrawStamp { x: number; y: number; emoji: string; color: string }
-
 export const DrawingEngine: React.FC = () => {
-  const session = useGameSession({ roundSeconds: 90, movementEnabled: false });
+  const session = useGameSession({ roundSeconds: 180, movementEnabled: false });
+  const canvasRef = useRef<PaintCanvasHandle>(null);
+  const [task, setTask] = useState(() => pickDrawingTask());
   const [color, setColor] = useState(DRAWING_COLORS[0]);
-  const [stamps, setStamps] = useState<DrawStamp[]>([]);
+  const [brushSize, setBrushSize] = useState(BRUSH_SIZES[1].size);
+  const [eraser, setEraser] = useState(false);
+  const [strokeCount, setStrokeCount] = useState(0);
 
-  const onCanvasTap = (x: number, y: number) => {
-    setStamps((s) => [...s, { x, y, emoji: '●', color }]);
+  const resetRound = useCallback(() => {
+    setTask((prev) => pickDrawingTask(prev.id));
+    setStrokeCount(0);
+    setEraser(false);
+    canvasRef.current?.clear();
+  }, []);
+
+  const onStroke = useCallback(() => {
+    setStrokeCount((n) => n + 1);
+  }, []);
+
+  const onDone = async () => {
+    if (strokeCount < task.minStrokes || session.isProcessing) return;
+    await session.handleCorrect(resetRound);
   };
 
-  const addStamp = (emoji: string) => {
-    setStamps((s) => [...s, { x: 40 + Math.random() * 20, y: 30 + Math.random() * 30, emoji, color: '#000' }]);
-  };
-
-  const onSave = async () => {
-    if (stamps.length < 3) return;
-    await session.handleCorrect(() => setStamps([]));
-  };
+  const canFinish = strokeCount >= task.minStrokes;
+  const progress = Math.min(100, Math.round((strokeCount / task.minStrokes) * 100));
 
   return (
-    <GameSessionLayout title="🎨 alkotó szoba" timeLeft={session.timeLeft} streak={session.streak} scroll={false}
+    <GameSessionLayout title="🎨 alkotó szoba" timeLeft={session.timeLeft} streak={session.streak} scroll
       showFeedback={session.showFeedback} feedbackMessage={session.feedbackMessage} feedbackType={session.feedbackType}
       showLevelUp={session.showLevelUp} levelUpLevel={session.levelUpLevel} levelUpReward={session.levelUpReward}
       onCloseLevelUp={session.closeLevelUp} showMovement={session.showMovement} movementChallenge={session.movementChallenge}
       onMovementComplete={() => session.completeMovement()} onMovementSkip={() => session.skipMovement()}
     >
+      <View style={styles.taskBanner}>
+        <Text style={styles.taskEmoji}>{task.emoji}</Text>
+        <Text style={styles.taskPrompt}>{task.prompt}</Text>
+      </View>
+      <SpeakButton text={task.prompt} label="🔊 feladat felolvasása" />
+
+      <View style={styles.toolRow}>
+        <Text style={styles.toolLabel}>ecset:</Text>
+        {BRUSH_SIZES.map((b) => (
+          <TouchableOpacity
+            key={b.label}
+            style={[styles.toolBtn, brushSize === b.size && !eraser && styles.toolBtnActive]}
+            onPress={() => { setBrushSize(b.size); setEraser(false); }}
+          >
+            <View style={[styles.brushPreview, { width: b.size + 8, height: b.size + 8, backgroundColor: eraser ? colors.gray : color }]} />
+            <Text style={styles.toolBtnText}>{b.label}</Text>
+          </TouchableOpacity>
+        ))}
+        <TouchableOpacity
+          style={[styles.toolBtn, eraser && styles.toolBtnActive]}
+          onPress={() => setEraser(true)}
+        >
+          <Text style={styles.eraserIcon}>🧽</Text>
+          <Text style={styles.toolBtnText}>radír</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.toolBtn} onPress={() => { canvasRef.current?.clear(); setStrokeCount(0); }}>
+          <Text style={styles.eraserIcon}>🗑️</Text>
+          <Text style={styles.toolBtnText}>új lap</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.colors}>
         {DRAWING_COLORS.map((c) => (
-          <TouchableOpacity key={c} style={[styles.colorDot, { backgroundColor: c, borderWidth: color === c ? 3 : 0 }]} onPress={() => setColor(c)} />
+          <TouchableOpacity
+            key={c}
+            style={[styles.colorDot, { backgroundColor: c, borderWidth: color === c && !eraser ? 4 : 2 }]}
+            onPress={() => { setColor(c); setEraser(false); }}
+          />
         ))}
       </View>
+
+      <PaintCanvas
+        ref={canvasRef}
+        color={color}
+        brushSize={brushSize}
+        eraser={eraser}
+        onStroke={onStroke}
+        height={300}
+      />
+
+      <Text style={styles.progressHint}>
+        {canFinish
+          ? 'szép munka! nyomd meg a kész gombot! 🌟'
+          : `festéssel haladás: ${strokeCount} / ${task.minStrokes} vonás (${progress}%)`}
+      </Text>
+
       <TouchableOpacity
-        style={styles.canvas}
-        activeOpacity={1}
-        onPress={(e) => {
-          const { locationX, locationY } = e.nativeEvent;
-          onCanvasTap((locationX / (SCREEN_W - 48)) * 100, (locationY / 280) * 100);
-        }}
+        style={[styles.doneBtn, !canFinish && styles.doneBtnDisabled]}
+        onPress={onDone}
+        disabled={!canFinish || session.isProcessing}
       >
-        <Svg width="100%" height={280}>
-          {stamps.map((s, i) =>
-            s.emoji === '●' ? (
-              <Circle key={i} cx={`${s.x}%`} cy={`${s.y}%`} r={8} fill={s.color} />
-            ) : null
-          )}
-        </Svg>
-        {stamps.filter((s) => s.emoji !== '●').map((s, i) => (
-          <Text key={`e-${i}`} style={[styles.stampOnCanvas, { left: `${s.x}%`, top: `${s.y}%` }]}>{s.emoji}</Text>
-        ))}
-      </TouchableOpacity>
-      <View style={styles.stamps}>
-        {DRAWING_STAMPS.map((em) => (
-          <TouchableOpacity key={em} onPress={() => addStamp(em)}><Text style={styles.stampBtn}>{em}</Text></TouchableOpacity>
-        ))}
-      </View>
-      <TouchableOpacity style={styles.doneBtn} onPress={onSave} disabled={stamps.length < 3 || session.isProcessing}>
-        <Text style={styles.doneText}>kész a kép! 🖼️</Text>
+        <Text style={styles.doneText}>kész a rajz! 🖼️</Text>
       </TouchableOpacity>
     </GameSessionLayout>
   );
@@ -413,12 +459,39 @@ const styles = StyleSheet.create({
   target: { position: 'absolute', padding: spacing.md },
   targetText: { fontSize: 48 },
   story: { ...typography.bodyLarge, textAlign: 'center', marginBottom: spacing.lg, padding: spacing.md, backgroundColor: colors.backgroundLight, borderRadius: 12, color: colors.text, borderWidth: 2, borderColor: colors.cardBorder },
-  colors: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.sm, justifyContent: 'center' },
-  colorDot: { width: 36, height: 36, borderRadius: 18, borderColor: colors.text },
-  canvas: { height: 280, backgroundColor: colors.white, borderRadius: 16, borderWidth: 2, borderColor: colors.grayLight, overflow: 'hidden', marginBottom: spacing.sm },
-  stampOnCanvas: { position: 'absolute', fontSize: 28 },
-  stamps: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'center', marginBottom: spacing.sm },
-  stampBtn: { fontSize: 28, padding: spacing.xs },
+  colors: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md, justifyContent: 'center' },
+  colorDot: { width: 40, height: 40, borderRadius: 20, borderColor: colors.textOnLight },
+  taskBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.panelLight,
+    padding: spacing.md,
+    borderRadius: 16,
+    marginBottom: spacing.sm,
+    borderWidth: 3,
+    borderColor: colors.accent,
+  },
+  taskEmoji: { fontSize: 40 },
+  taskPrompt: { ...typography.h3, color: colors.textOnLight, flex: 1, fontWeight: '800' },
+  toolRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.sm, justifyContent: 'center', alignItems: 'center' },
+  toolLabel: { ...typography.bodySmall, color: colors.textLight, fontWeight: '700', width: '100%', textAlign: 'center', marginBottom: 2 },
+  toolBtn: {
+    alignItems: 'center',
+    backgroundColor: colors.panelLight,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.grayLight,
+    minWidth: 64,
+  },
+  toolBtnActive: { borderColor: colors.primary, backgroundColor: colors.backgroundLight },
+  toolBtnText: { ...typography.bodySmall, color: colors.textOnLight, fontWeight: '700', marginTop: 2 },
+  brushPreview: { borderRadius: 99 },
+  eraserIcon: { fontSize: 22 },
+  progressHint: { ...typography.body, textAlign: 'center', color: colors.textLight, marginTop: spacing.sm, marginBottom: spacing.xs },
+  doneBtnDisabled: { opacity: 0.45 },
   collageBoard: { height: 220, backgroundColor: colors.white, borderRadius: 16, borderWidth: 2, borderColor: colors.grayLight, marginBottom: spacing.md },
   shapes: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'center' },
   shapePick: { backgroundColor: colors.primaryLight, padding: spacing.md, borderRadius: 12 },

@@ -1,10 +1,8 @@
 /**
- * Szintlépés ünnepély – nyugodt rakéta animáció.
- * A rakéta a ház mellett indul, lassan felszáll az ég felé.
- * Csak szintlépéskor jelenik meg; a jutalmat a szülő adja oda.
+ * Szintlépés – űr-küldetés ünnep (web: hang + neon animáció)
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,14 +12,14 @@ import {
   Animated,
   Easing,
   Dimensions,
+  Platform,
 } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { colors, spacing, typography, shadows } from '../theme';
 import type { Reward } from '../rewards/rewards';
+import { playLevelUpFanfare, playRocketLaunch } from '../utils/celebrationSound';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const ROCKET_TRAVEL_HEIGHT = SCREEN_HEIGHT * 0.55;
-const ANIMATION_DURATION_MS = 2000;
-const LAUNCH_DELAY_MS = 400;
+const { width: W, height: H } = Dimensions.get('window');
+const TRAVEL = H * 0.52;
 
 interface LevelUpRocketScreenProps {
   visible: boolean;
@@ -30,27 +28,71 @@ interface LevelUpRocketScreenProps {
   onClose: () => void;
 }
 
-// Egyszerű csillagok (statikus pontok) – nem villognak
-function StarField() {
-  const positions = [
-    { top: 24, left: 32 },
-    { top: 48, left: 280 },
-    { top: 72, left: 64 },
-    { top: 40, left: 160 },
-    { top: 56, left: 240 },
-    { top: 32, left: 320 },
-    { top: 80, left: 200 },
-    { top: 16, left: 100 },
-  ];
+function StarBurst({ delay }: { delay: number }) {
+  const opacity = useRef(new Animated.Value(0.3)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 800 + delay * 40, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.25, duration: 800 + delay * 40, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [delay, opacity]);
+  const left = (delay * 47 + 13) % (W - 24);
+  const top = (delay * 31 + 7) % (H * 0.55);
+  const size = 2 + (delay % 4);
   return (
-    <>
-      {positions.map((pos, i) => (
-        <View
-          key={i}
-          style={[styles.star, { top: pos.top, left: pos.left }]}
-        />
-      ))}
-    </>
+    <Animated.View
+      style={[styles.star, { left, top, width: size, height: size, opacity }]}
+    />
+  );
+}
+
+function ConfettiPiece({ index }: { index: number }) {
+  const y = useRef(new Animated.Value(-20)).current;
+  const x = useRef(new Animated.Value(0)).current;
+  const rot = useRef(new Animated.Value(0)).current;
+  const startX = (index / 12) * W;
+  const hue = ['#00D4FF', '#7CFF6B', '#FF6B2C', '#FFB347', '#B388FF'][index % 5];
+
+  useEffect(() => {
+    y.setValue(-20);
+    x.setValue(0);
+    rot.setValue(0);
+    Animated.parallel([
+      Animated.timing(y, {
+        toValue: H * 0.45,
+        duration: 2200 + index * 80,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(x, {
+        toValue: (index % 2 === 0 ? 1 : -1) * (30 + index * 8),
+        duration: 2200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rot, { toValue: 1, duration: 2200, useNativeDriver: true }),
+    ]).start();
+  }, [index, rot, x, y]);
+
+  const spin = rot.interpolate({ inputRange: [0, 1], outputRange: ['0deg', `${360 + index * 40}deg`] });
+
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        left: startX,
+        top: 0,
+        width: 8,
+        height: 14,
+        backgroundColor: hue,
+        borderRadius: 2,
+        transform: [{ translateY: y }, { translateX: x }, { rotate: spin }],
+        opacity: 0.85,
+      }}
+    />
   );
 }
 
@@ -60,86 +102,152 @@ export const LevelUpRocketScreen: React.FC<LevelUpRocketScreenProps> = ({
   reward,
   onClose,
 }) => {
-  const translateY = useRef(new Animated.Value(0)).current;
-  const [animationDone, setAnimationDone] = useState(false);
+  const rocketY = useRef(new Animated.Value(0)).current;
+  const flameScale = useRef(new Animated.Value(1)).current;
+  const titleScale = useRef(new Animated.Value(0.5)).current;
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const glowPulse = useRef(new Animated.Value(0.6)).current;
+  const activeRef = useRef(false);
+  const rewardShownRef = useRef(false);
+  const [showReward, setShowReward] = useState(false);
+
+  const revealReward = () => {
+    if (rewardShownRef.current || !activeRef.current) return;
+    rewardShownRef.current = true;
+    playLevelUpFanfare();
+    setShowReward(true);
+  };
+
+  const stars = useMemo(() => Array.from({ length: 28 }, (_, i) => i), []);
+  const confetti = useMemo(() => Array.from({ length: 14 }, (_, i) => i), []);
 
   useEffect(() => {
     if (!visible) {
-      translateY.setValue(0);
-      setAnimationDone(false);
+      activeRef.current = false;
+      rewardShownRef.current = false;
+      rocketY.stopAnimation();
+      rocketY.setValue(0);
+      titleScale.setValue(0.5);
+      titleOpacity.setValue(0);
+      setShowReward(false);
       return;
     }
 
-    const timer = setTimeout(() => {
-      Animated.timing(translateY, {
-        toValue: -ROCKET_TRAVEL_HEIGHT,
-        duration: ANIMATION_DURATION_MS,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }).start(() => setAnimationDone(true));
-    }, LAUNCH_DELAY_MS);
+    activeRef.current = true;
+    rewardShownRef.current = false;
+    playRocketLaunch();
+    setShowReward(false);
 
-    return () => clearTimeout(timer);
-  }, [visible, translateY]);
+    Animated.parallel([
+      Animated.spring(titleScale, { toValue: 1, friction: 5, tension: 80, useNativeDriver: true }),
+      Animated.timing(titleOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+    ]).start();
+
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(glowPulse, { toValue: 0.5, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    pulse.start();
+
+    const flameLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(flameScale, { toValue: 1.35, duration: 120, useNativeDriver: true }),
+        Animated.timing(flameScale, { toValue: 0.85, duration: 100, useNativeDriver: true }),
+      ]),
+    );
+    flameLoop.start();
+
+    const fallbackTimer = setTimeout(revealReward, 3200);
+
+    const launchTimer = setTimeout(() => {
+      Animated.timing(rocketY, {
+        toValue: -TRAVEL,
+        duration: 2400,
+        easing: Easing.inOut(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished && activeRef.current) revealReward();
+      });
+    }, 600);
+
+    return () => {
+      activeRef.current = false;
+      clearTimeout(launchTimer);
+      clearTimeout(fallbackTimer);
+      rocketY.stopAnimation();
+      pulse.stop();
+      flameLoop.stop();
+    };
+  }, [visible, rocketY, flameScale, titleScale, titleOpacity, glowPulse]);
 
   if (!visible) return null;
 
-  const rewardText = reward?.description ?? '';
+  const rewardText = reward?.description ?? 'nagyszerű munka!';
 
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      onRequestClose={onClose}
-      statusBarTranslucent
-    >
-      <View style={styles.container}>
-        {/* Háttér rétegek: föld (ház), ég, űr */}
-        <View style={styles.ground}>
-          <Text style={styles.house}>🏠</Text>
+    <Modal visible={visible} animationType="fade" transparent statusBarTranslucent onRequestClose={onClose}>
+      <View style={styles.backdrop}>
+        <View style={styles.spaceBg}>
+          {stars.map((i) => (
+            <StarBurst key={i} delay={i} />
+          ))}
+          <View style={styles.nebulaTop} />
+          <View style={styles.nebulaBottom} />
         </View>
-        <View style={styles.sky} />
-        <View style={styles.space}>
-          <StarField />
-        </View>
-        {/* Rákéta a háttér fölé – indul a föld szintjén, felfelé animál */}
+
+        {showReward && confetti.map((i) => (
+          <ConfettiPiece key={i} index={i} />
+        ))}
+
         <Animated.View
           style={[
-            styles.rocketWrap,
-            {
-              transform: [{ translateY }],
-            },
+            styles.header,
+            { opacity: titleOpacity, transform: [{ scale: titleScale }] },
           ]}
-          pointerEvents="none"
         >
-          <View style={styles.rocketColumn}>
-            <Text style={styles.rocket}>🚀</Text>
-            <View style={styles.flame} />
-          </View>
+          <Text style={styles.badge}>⭐ szintlépés ⭐</Text>
+          <Animated.View style={[styles.levelRing, { opacity: glowPulse }, shadows.glow(colors.primary)]}>
+            <Text style={styles.levelNum}>{level}</Text>
+          </Animated.View>
+          <Text style={styles.title}>ügyes vagy, űrhajós!</Text>
+          <Text style={styles.subtitle}>elérted a {level}. szintet</Text>
         </Animated.View>
 
-        {/* Szöveg felül – mindig látható, nagy kontraszt */}
-        <View style={styles.textOverlay} pointerEvents="box-none">
-          <Text style={styles.title}>szintet léptél!</Text>
-          <Text style={styles.subtitle}>elérted a(z) {level}. szintet</Text>
+        <Animated.View style={[styles.rocketWrap, { transform: [{ translateY: rocketY }] }]}>
+          <View style={styles.trail}>
+            {[0, 1, 2, 3].map((i) => (
+              <View key={i} style={[styles.trailDot, { opacity: 0.5 - i * 0.1, marginTop: i * 6 }]} />
+            ))}
+          </View>
+          <Text style={styles.rocketEmoji}>🚀</Text>
+          <Animated.View style={[styles.flameWrap, { transform: [{ scaleY: flameScale }] }]}>
+            <Text style={styles.flameEmoji}>🔥</Text>
+          </Animated.View>
+        </Animated.View>
+
+        <View style={styles.planetRow}>
+          <Text style={styles.planet}>🪐</Text>
+          <Text style={styles.planetSmall}>🌍</Text>
         </View>
 
-        {/* Animáció után: jutalom szöveg + gomb */}
-        {animationDone && (
-          <View style={styles.bottomCard}>
-            <View style={styles.rewardBlock}>
-              <Text style={styles.rewardLabel}>jutalom:</Text>
-              <Text style={styles.rewardDescription}>{rewardText}</Text>
-              <Text style={styles.parentNote}>a szülő adja oda a jutalmat</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={onClose}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.buttonText}>tovább</Text>
+        {!showReward && (
+          <TouchableOpacity style={styles.skipBtn} onPress={revealReward} activeOpacity={0.8}>
+            <Text style={styles.skipText}>ugrom a jutalomhoz →</Text>
+          </TouchableOpacity>
+        )}
+
+        {showReward && (
+          <Animated.View style={[styles.rewardCard, shadows.glow(colors.accent)]}>
+            <Text style={styles.rewardIcon}>🎁</Text>
+            <Text style={styles.rewardLabel}>jutalom a {level}. szinten</Text>
+            <Text style={styles.rewardDesc}>{rewardText}</Text>
+            <Text style={styles.parentNote}>a szülő adja oda a jutalmat</Text>
+            <TouchableOpacity style={styles.ctaBtn} onPress={onClose} activeOpacity={0.85}>
+              <Text style={styles.ctaText}>tovább a küldetésekre →</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         )}
       </View>
     </Modal>
@@ -147,142 +255,173 @@ export const LevelUpRocketScreen: React.FC<LevelUpRocketScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
+  backdrop: {
     flex: 1,
-    backgroundColor: '#87CEEB',
+    backgroundColor: colors.backgroundDark,
+    overflow: 'hidden',
   },
-  ground: {
+  spaceBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.background,
+  },
+  nebulaTop: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 140,
-    backgroundColor: '#8B9A6B',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    paddingBottom: 24,
+    top: -80,
+    left: -40,
+    width: W * 0.8,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#1a1040',
+    opacity: 0.7,
+    ...(Platform.OS === 'web' ? { filter: 'blur(40px)' } as object : {}),
   },
-  house: {
-    fontSize: 56,
-  },
-  rocketWrap: {
+  nebulaBottom: {
     position: 'absolute',
-    bottom: 132,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  rocketColumn: {
-    alignItems: 'center',
-  },
-  rocket: {
-    fontSize: 52,
-  },
-  flame: {
-    width: 16,
-    height: 20,
-    backgroundColor: colors.accent,
-    marginTop: -4,
-    borderRadius: 8,
-    opacity: 0.9,
-    alignSelf: 'center',
-  },
-  sky: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 140,
-    top: SCREEN_HEIGHT * 0.35,
-    backgroundColor: '#87CEEB',
-  },
-  space: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    height: SCREEN_HEIGHT * 0.35,
-    backgroundColor: '#0f172a',
+    bottom: 40,
+    right: -60,
+    width: W * 0.7,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: '#0a2840',
+    opacity: 0.6,
   },
   star: {
     position: 'absolute',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    borderRadius: 4,
     backgroundColor: colors.white,
-    opacity: 0.9,
   },
-  textOverlay: {
-    position: 'absolute',
-    top: spacing.xxl,
-    left: spacing.lg,
-    right: spacing.lg,
+  header: {
     alignItems: 'center',
+    paddingTop: spacing.xxl + 8,
+    paddingHorizontal: spacing.lg,
+    zIndex: 10,
+  },
+  badge: {
+    ...typography.label,
+    color: colors.secondary,
+    marginBottom: spacing.sm,
+  },
+  levelRing: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    borderWidth: 4,
+    borderColor: colors.primary,
+    backgroundColor: colors.backgroundLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  levelNum: {
+    fontSize: 42,
+    fontWeight: '900',
+    color: colors.primary,
   },
   title: {
     ...typography.h1,
-    fontSize: 28,
-    color: colors.white,
+    fontSize: 26,
+    color: colors.text,
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   subtitle: {
-    ...typography.h2,
-    fontSize: 22,
-    color: colors.white,
+    ...typography.bodyLarge,
+    color: colors.textLight,
     textAlign: 'center',
-    marginTop: spacing.sm,
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    marginTop: spacing.xs,
   },
-  bottomCard: {
+  rocketWrap: {
+    position: 'absolute',
+    bottom: H * 0.28,
+    alignSelf: 'center',
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  trail: { alignItems: 'center', marginBottom: 4 },
+  trailDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.accent,
+  },
+  rocketEmoji: {
+    fontSize: 72,
+    ...(Platform.OS === 'web'
+      ? { textShadow: '0 0 24px rgba(0,212,255,0.8)' } as object
+      : {}),
+  },
+  flameWrap: { marginTop: -8 },
+  flameEmoji: { fontSize: 36 },
+  planetRow: {
+    position: 'absolute',
+    bottom: H * 0.12,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 40,
+    opacity: 0.7,
+  },
+  planet: { fontSize: 48 },
+  planetSmall: { fontSize: 36 },
+  skipBtn: {
+    position: 'absolute',
+    bottom: H * 0.06,
+    alignSelf: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    zIndex: 10,
+  },
+  skipText: {
+    ...typography.body,
+    color: colors.textLight,
+    fontWeight: '700',
+  },
+  rewardCard: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: colors.backgroundLight,
-    borderTopLeftRadius: spacing.cardBorderRadius * 1.5,
-    borderTopRightRadius: spacing.cardBorderRadius * 1.5,
+    backgroundColor: colors.cardBackground,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderWidth: 2,
+    borderColor: colors.accent,
     padding: spacing.xl,
-    paddingBottom: spacing.xxl + 16,
+    paddingBottom: spacing.xxl + 12,
     alignItems: 'center',
   },
-  rewardBlock: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
+  rewardIcon: { fontSize: 48, marginBottom: spacing.sm },
   rewardLabel: {
-    ...typography.body,
-    color: colors.textLight,
+    ...typography.label,
+    color: colors.accent,
+    marginBottom: spacing.xs,
   },
-  rewardDescription: {
+  rewardDesc: {
     ...typography.h3,
     color: colors.primary,
     textAlign: 'center',
-    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
   },
   parentNote: {
     ...typography.bodySmall,
     color: colors.textLight,
-    textAlign: 'center',
-    marginTop: spacing.md,
     fontStyle: 'italic',
+    marginBottom: spacing.lg,
   },
-  button: {
-    backgroundColor: colors.primary,
+  ctaBtn: {
+    backgroundColor: colors.accent,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
-    borderRadius: spacing.cardBorderRadius,
-    minHeight: spacing.touchTargetMin,
-    justifyContent: 'center',
-    minWidth: 200,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.accentDark,
+    borderBottomWidth: 4,
+    minWidth: 260,
     alignItems: 'center',
   },
-  buttonText: {
-    ...typography.buttonLarge,
-    color: colors.white,
+  ctaText: {
+    ...typography.button,
+    color: colors.backgroundDark,
+    fontWeight: '800',
   },
 });

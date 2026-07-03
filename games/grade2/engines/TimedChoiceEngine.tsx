@@ -2,9 +2,10 @@
  * Általános időzített választós játékmotor
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, spacing, typography } from '../../../theme';
+import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
 
@@ -26,14 +27,11 @@ export const TimedChoiceEngine: React.FC<TimedChoiceEngineProps> = ({
   getQuestion,
   roundSeconds = 45,
 }) => {
-  const session = useGameSession({ roundSeconds });
   const [q, setQ] = useState(getQuestion);
-
-  useEffect(() => {
-    if (session.timerExpired && !session.isProcessing) {
-      session.handleTimeout(() => setQ(getQuestion()));
-    }
-  }, [session.timerExpired]);
+  const session = useGameSession({
+    roundSeconds,
+    onRoundTimeout: () => setQ(getQuestion()),
+  });
 
   const next = () => setQ(getQuestion());
 
@@ -64,13 +62,13 @@ export const TimedChoiceEngine: React.FC<TimedChoiceEngineProps> = ({
       onMovementComplete={() => session.completeMovement(next)}
       onMovementSkip={() => session.skipMovement(next)}
     >
-      {q.subtitle ? <Text style={styles.subtitle}>{q.subtitle}</Text> : null}
-      <Text style={styles.prompt}>{q.prompt}</Text>
+      {q.subtitle ? <Text style={g2.subtitle}>{q.subtitle}</Text> : null}
+      <Text style={g2.prompt}>{q.prompt}</Text>
       <View style={styles.grid}>
         {q.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
+          <TouchableOpacity key={i} style={g2.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
             {opt.emoji ? <Text style={styles.emoji}>{opt.emoji}</Text> : null}
-            <Text style={styles.optionText}>{opt.label}</Text>
+            <Text style={g2.optionTextBody}>{opt.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -79,18 +77,6 @@ export const TimedChoiceEngine: React.FC<TimedChoiceEngineProps> = ({
 };
 
 const styles = StyleSheet.create({
-  subtitle: { ...typography.body, color: colors.textLight, textAlign: 'center', marginBottom: spacing.sm },
-  prompt: { ...typography.h3, color: colors.text, textAlign: 'center', marginBottom: spacing.lg },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
-  option: {
-    backgroundColor: colors.cardBackground,
-    borderRadius: 16,
-    padding: spacing.md,
-    minWidth: '42%',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
-  },
   emoji: { fontSize: 36, marginBottom: spacing.xs },
-  optionText: { ...typography.body, fontWeight: '600', color: colors.text, textAlign: 'center' },
 });

@@ -83,7 +83,7 @@ export const NumberGameScreen: React.FC = () => {
       levelUpReward={levelUpReward}
       onCloseLevelUp={() => { markLevelRewardSeen(levelUpLevel); setShowLevelUp(false); }}
     >
-      <Text style={gs.prompt}>melyik csoportban van ennyi?</Text>
+      <Text style={gs.prompt}>számold meg! melyik csoportban ugyanennyi darab van?</Text>
       <GameHeroBox>
         <Text style={gs.heroNumber}>{gameState.currentQuestion.number}</Text>
       </GameHeroBox>

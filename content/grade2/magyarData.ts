@@ -48,16 +48,34 @@ export interface PunctuationTask {
   correct: number;
 }
 
-const PUNCTUATION: PunctuationTask[] = [
-  { sentence: '___ ma iskolába megyek.', missing: 'Ma', options: ['Ma', 'ma', '!', '?'], correct: 0 },
-  { sentence: 'Milyen szép az idő___', missing: '!', options: ['.', '!', '?', ','], correct: 1 },
-  { sentence: 'Hol van a tollad___', missing: '?', options: ['.', '!', '?', ','], correct: 2 },
-  { sentence: 'Kérlek___ add ide a könyvet.', missing: ',', options: ['.', '!', '?', ','], correct: 3 },
-  { sentence: '___ a kutya az udvaron játszik.', missing: 'A', options: ['A', 'a', '.', '!'], correct: 0 },
+const SENTENCE_END_MARKS = ['.', '!', '?'] as const;
+type SentenceEndMark = (typeof SENTENCE_END_MARKS)[number];
+
+/** Csak mondatvégi írásjel hiányzik – pont, felkiáltó, kérdő */
+const PUNCTUATION_SENTENCES: { sentence: string; missing: SentenceEndMark }[] = [
+  { sentence: 'Ma iskolába megyek___', missing: '.' },
+  { sentence: 'A kutya az udvaron játszik___', missing: '.' },
+  { sentence: 'Este mesét olvasunk___', missing: '.' },
+  { sentence: 'Szeretek rajzolni___', missing: '.' },
+  { sentence: 'Milyen szép az idő___', missing: '!' },
+  { sentence: 'Figyelj rám___', missing: '!' },
+  { sentence: 'Ne szaladj az utcán___', missing: '!' },
+  { sentence: 'Milyen jó ez a játék___', missing: '!' },
+  { sentence: 'Hol van a tollad___', missing: '?' },
+  { sentence: 'Mikor jön a vonat___', missing: '?' },
+  { sentence: 'Ki hívogat___', missing: '?' },
+  { sentence: 'Hány alma van a kosárban___', missing: '?' },
 ];
 
 export function pickPunctuationTask(): PunctuationTask {
-  return PUNCTUATION[Math.floor(Math.random() * PUNCTUATION.length)];
+  const base = PUNCTUATION_SENTENCES[Math.floor(Math.random() * PUNCTUATION_SENTENCES.length)];
+  const options = shuffle([...SENTENCE_END_MARKS]);
+  return {
+    sentence: base.sentence,
+    missing: base.missing,
+    options: [...options],
+    correct: options.indexOf(base.missing),
+  };
 }
 
 export interface SortWord {
@@ -127,7 +145,7 @@ const SCAFFOLDS: ScaffoldPrompt[] = [
     slots: [
       { prompt: 'a kedvenc állatom…', options: ['egy kutya', 'egy autó', 'egy ház'], correct: 0 },
       { prompt: 'szeret…', options: ['játszani velem', 'repülni az égen', 'főzni'], correct: 0 },
-      { prompt: 'este…', options: [' együtt pihenünk', ' repülünk', ' tanítunk matekot'], correct: 0 },
+      { prompt: 'este…', options: ['együtt pihenünk', 'repülünk', 'matekot tanítunk'], correct: 0 },
     ],
   },
 ];

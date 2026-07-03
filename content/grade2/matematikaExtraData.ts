@@ -88,10 +88,10 @@ export interface WordProblemTask {
 }
 
 const WORD_PROBLEMS: WordProblemTask[] = [
-  { text: '3 madár ült a fán. jött még 2. hány madár van?', a: 3, b: 2, op: 'add', answer: 5, icons: '🐦' },
-  { text: '8 alma volt. megettem 3-at. hány maradt?', a: 8, b: 3, op: 'subtract', answer: 5, icons: '🍎' },
-  { text: '4 gyerek játszott. csatlakozott 4. hányan vannak?', a: 4, b: 4, op: 'add', answer: 8, icons: '👧' },
-  { text: '10 toll volt. elveszett 6. hány maradt?', a: 10, b: 6, op: 'subtract', answer: 4, icons: '✏️' },
+  { text: '3 madár ült a fán. jött még 2. hány madár van most?', a: 3, b: 2, op: 'add', answer: 5, icons: '🐦' },
+  { text: '8 alma volt a tányéron. megettem 3-at. hány maradt?', a: 8, b: 3, op: 'subtract', answer: 5, icons: '🍎' },
+  { text: '4 gyerek játszott. jött még 4 barát. hányan vannak?', a: 4, b: 4, op: 'add', answer: 8, icons: '👧' },
+  { text: '10 toll volt a tolltartóban. 6 elveszett. hány maradt?', a: 10, b: 6, op: 'subtract', answer: 4, icons: '✏️' },
 ];
 
 export function pickWordProblem(): WordProblemTask {

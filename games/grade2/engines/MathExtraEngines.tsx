@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, spacing, typography } from '../../../theme';
+import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
 import {
@@ -17,7 +18,7 @@ import {
   pickShapeHunt,
   pickMeasureTask,
 } from '../../../content/grade2/matematikaExtraData';
-import { shuffleArray, useRoundOptions } from '../utils/roundOptions';
+import { shuffleArray, useRoundOptions, buildUniqueNumberOptions } from '../utils/roundOptions';
 
 function OptionGrid({
   options,
@@ -33,8 +34,8 @@ function OptionGrid({
   return (
     <View style={styles.grid}>
       {options.map((opt, i) => (
-        <TouchableOpacity key={`${String(opt)}-${i}`} style={styles.option} onPress={() => onPick(i)} disabled={disabled}>
-          <Text style={styles.optionText}>{renderLabel ? renderLabel(opt) : String(opt)}</Text>
+        <TouchableOpacity key={`${String(opt)}-${i}`} style={g2.option} onPress={() => onPick(i)} disabled={disabled}>
+          <Text style={g2.optionText}>{renderLabel ? renderLabel(opt) : String(opt)}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -47,14 +48,14 @@ export const NumberLineEngine: React.FC = () => {
   const pos = task.start;
 
   const { options: opts, correctIdx } = useRoundOptions(task, () => {
-    const optsSet = new Set<number>([task.answer]);
-    while (optsSet.size < 4) {
-      optsSet.add(task.answer + (Math.floor(Math.random() * 5) - 2) * task.table);
+    const candidates: number[] = [];
+    for (let i = 1; candidates.length < 6 && i < 10; i++) {
+      const up = task.answer + i * task.table;
+      const down = task.answer - i * task.table;
+      if (up > 0) candidates.push(up);
+      if (down > 0) candidates.push(down);
     }
-    const built = [...optsSet].filter((v) => v > 0).slice(0, 4);
-    while (built.length < 4) built.push(task.answer + built.length * task.table);
-    const options = shuffleArray(built);
-    return { options, correctIdx: options.indexOf(task.answer) };
+    return buildUniqueNumberOptions(task.answer, 4, candidates);
   });
 
   const reset = () => setTask(pickNumberLineTask());
@@ -82,9 +83,9 @@ export const NumberLineEngine: React.FC = () => {
       onMovementComplete={() => session.completeMovement(reset)}
       onMovementSkip={() => session.skipMovement(reset)}
     >
-      <Text style={styles.prompt}>ugrás {task.table}-esével, {task.jumps}x – honnan: {pos}</Text>
-      <Text style={styles.line}>0 — {pos} — ? — …</Text>
-      <Text style={styles.sub}>hova érsz?</Text>
+      <Text style={styles.prompt}>számtű – ugrás {task.table}-esével</Text>
+      <Text style={styles.sub}>kezdet: {pos} · {task.jumps} ugrás · hova érsz?</Text>
+      <Text style={styles.line}>{pos} → ?</Text>
       <OptionGrid options={opts} onPick={onPick} disabled={session.isProcessing} />
     </GameSessionLayout>
   );
@@ -95,11 +96,15 @@ export const SharingEngine: React.FC = () => {
   const [task, setTask] = useState(() => pickSharingTask());
   const reset = () => setTask(pickSharingTask());
 
-  const { options: unique, correctIdx } = useRoundOptions(task, () => {
-    const raw = [task.perGroup, task.perGroup + 1, task.perGroup - 1, task.groups].filter((v) => v > 0);
-    const options = shuffleArray([...new Set(raw)].slice(0, 4));
-    return { options, correctIdx: options.indexOf(task.perGroup) };
-  });
+  const { options: unique, correctIdx } = useRoundOptions(task, () =>
+    buildUniqueNumberOptions(task.perGroup, 4, [
+      task.perGroup + 1,
+      task.perGroup - 1,
+      task.groups,
+      task.perGroup + 2,
+      task.total,
+    ]),
+  );
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -136,11 +141,15 @@ export const ShoppingEngine: React.FC = () => {
   const [task, setTask] = useState(() => pickShoppingTask());
   const reset = () => setTask(pickShoppingTask());
 
-  const { options: unique, correctIdx } = useRoundOptions(task, () => {
-    const raw = [task.change, task.change + 5, task.change - 5, task.price].filter((v) => v >= 0);
-    const options = shuffleArray([...new Set(raw)].slice(0, 4));
-    return { options, correctIdx: options.indexOf(task.change) };
-  });
+  const { options: unique, correctIdx } = useRoundOptions(task, () =>
+    buildUniqueNumberOptions(task.change, 4, [
+      task.change + 5,
+      task.change - 5,
+      task.price,
+      task.paid,
+      task.change + 10,
+    ].filter((v) => v >= 0)),
+  );
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -213,8 +222,10 @@ export const ClockEngine: React.FC = () => {
       onMovementSkip={() => session.skipMovement(reset)}
     >
       <Text style={styles.bigEmoji}>🕐</Text>
-      <Text style={styles.prompt}>melyik időt mutatja az óra?</Text>
-      <Text style={styles.sub}>{task.hours} óra {task.minutes} perc</Text>
+      <Text style={styles.prompt}>melyik felirat ugyanazt az időt írja?</Text>
+      <View style={g2.infoPanel}>
+        <Text style={g2.infoPanelText}>{task.hours} óra {task.minutes} perc</Text>
+      </View>
       <OptionGrid options={opts} onPick={onPick} disabled={session.isProcessing} />
     </GameSessionLayout>
   );
@@ -225,11 +236,15 @@ export const WordProblemEngine: React.FC = () => {
   const [task, setTask] = useState(() => pickWordProblem());
   const reset = () => setTask(pickWordProblem());
 
-  const { options: unique, correctIdx } = useRoundOptions(task, () => {
-    const raw = [task.answer, task.answer + 1, task.answer - 1, task.answer + 2].filter((v) => v >= 0);
-    const options = shuffleArray([...new Set(raw)].slice(0, 4));
-    return { options, correctIdx: options.indexOf(task.answer) };
-  });
+  const { options: unique, correctIdx } = useRoundOptions(task, () =>
+    buildUniqueNumberOptions(task.answer, 4, [
+      task.answer + 1,
+      task.answer - 1,
+      task.answer + 2,
+      task.a,
+      task.b,
+    ].filter((v) => v >= 0)),
+  );
 
   const onPick = async (idx: number) => {
     if (session.isProcessing) return;
@@ -256,6 +271,7 @@ export const WordProblemEngine: React.FC = () => {
     >
       <Text style={styles.bigEmoji}>{task.icons.repeat(Math.min(task.a, 8))}</Text>
       <Text style={styles.story}>{task.text}</Text>
+      <Text style={styles.sub}>mennyi a válasz?</Text>
       <OptionGrid options={unique} onPick={onPick} disabled={session.isProcessing} />
     </GameSessionLayout>
   );
@@ -332,7 +348,7 @@ export const MeasureEngine: React.FC = () => {
     >
       <Text style={styles.bigEmoji}>{task.emoji}</Text>
       <Text style={styles.prompt}>hány cm hosszú a {task.object}?</Text>
-      <View style={styles.ruler}>
+      <View style={g2.infoPanel}>
         <Text style={styles.rulerText}>|——{task.lengthCm} cm——|</Text>
       </View>
       <OptionGrid options={task.options} onPick={onPick} disabled={session.isProcessing} renderLabel={(v) => `${v} cm`} />
@@ -343,22 +359,11 @@ export const MeasureEngine: React.FC = () => {
 const styles = StyleSheet.create({
   prompt: { ...typography.h3, textAlign: 'center', marginBottom: spacing.md, color: colors.text },
   sub: { ...typography.body, textAlign: 'center', color: colors.textLight, marginBottom: spacing.md },
-  story: { ...typography.bodyLarge, textAlign: 'center', marginBottom: spacing.lg, paddingHorizontal: spacing.sm },
+  story: { ...typography.bodyLarge, textAlign: 'center', marginBottom: spacing.sm, paddingHorizontal: spacing.sm, color: colors.text },
   line: { ...typography.h2, textAlign: 'center', color: colors.primary, marginBottom: spacing.sm },
   bigEmoji: { fontSize: 48, textAlign: 'center', marginBottom: spacing.md },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
-  option: {
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: 12,
-    minWidth: '40%',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
-  },
-  optionText: { ...typography.h3, color: colors.text },
-  shapeBtn: { padding: spacing.md, backgroundColor: colors.accentLight, borderRadius: 16 },
+  shapeBtn: { padding: spacing.md, backgroundColor: colors.cardBackground, borderRadius: 16, borderWidth: 2, borderColor: colors.primary },
   shapeEmoji: { fontSize: 48 },
-  ruler: { backgroundColor: colors.white, padding: spacing.md, borderRadius: 8, marginBottom: spacing.lg, alignItems: 'center' },
-  rulerText: { ...typography.body, fontFamily: 'monospace' },
+  rulerText: { ...typography.body, fontFamily: 'monospace', color: colors.primary, fontWeight: '700' },
 });

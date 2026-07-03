@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, spacing, typography } from '../../../theme';
+import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
 import {
@@ -25,7 +26,7 @@ export const SeasonSpinEngine: React.FC = () => (
     getQuestion={() => {
       const { item, options, correct } = pickSeasonMatch();
       return {
-        prompt: `${item.itemEmoji} ${item.item} – melyik évszakhoz illik?`,
+        prompt: `${item.itemEmoji} ${item.item} – melyik évszakban van?`,
         options: options.map((o) => ({ label: o, emoji: o === 'tavasz' ? '🌸' : o === 'nyár' ? '☀️' : o === 'ősz' ? '🍂' : '❄️' })),
         correct,
       };
@@ -59,8 +60,8 @@ export const BodyLabelEngine: React.FC = () => (
     getQuestion={() => {
       const b = pickBodyPart();
       return {
-        prompt: 'melyik testrész?',
-        subtitle: b.emoji,
+        prompt: 'a képen melyik testrész látható?',
+        subtitle: `👉 ${b.emoji}`,
         options: b.options.map((o) => ({ label: o })),
         correct: b.options.indexOf(b.part),
       };
@@ -99,11 +100,11 @@ export const TrafficLightEngine: React.FC = () => {
       onMovementSkip={() => session.skipMovement(reset)}
     >
       <View style={[styles.light, { backgroundColor: LIGHT_COLORS[task.light] }]} />
-      <Text style={styles.prompt}>mit kell tenned?</Text>
+      <Text style={g2.prompt}>mit kell tenned?</Text>
       <View style={styles.grid}>
         {task.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
-            <Text style={styles.optionText}>{opt}</Text>
+          <TouchableOpacity key={i} style={g2.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
+            <Text style={g2.optionTextBody}>{opt}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -139,8 +140,8 @@ export const HealthSortEngine: React.FC = () => {
       onMovementComplete={() => session.completeMovement(reset)}
       onMovementSkip={() => session.skipMovement(reset)}
     >
-      <Text style={styles.bigEmoji}>{item.emoji}</Text>
-      <Text style={styles.prompt}>{item.item} – egészséges?</Text>
+      <Text style={g2.emojiHero}>{item.emoji}</Text>
+      <Text style={g2.prompt}>{item.item} – egészséges?</Text>
       <View style={styles.row}>
         <TouchableOpacity style={[styles.bigBtn, styles.yes]} onPress={() => onPick(true)} disabled={session.isProcessing}>
           <Text style={styles.bigBtnText}>igen ✅</Text>
@@ -154,15 +155,11 @@ export const HealthSortEngine: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  light: { width: 80, height: 80, borderRadius: 40, alignSelf: 'center', marginBottom: spacing.lg },
-  prompt: { ...typography.h3, textAlign: 'center', marginBottom: spacing.lg },
+  light: { width: 80, height: 80, borderRadius: 40, alignSelf: 'center', marginBottom: spacing.lg, borderWidth: 3, borderColor: colors.cardBorder },
   grid: { gap: spacing.sm },
-  option: { backgroundColor: colors.white, padding: spacing.md, borderRadius: 12, borderWidth: 2, borderColor: colors.primaryLight },
-  optionText: { ...typography.body, textAlign: 'center', fontWeight: '600' },
-  bigEmoji: { fontSize: 64, textAlign: 'center', marginBottom: spacing.md },
   row: { flexDirection: 'row', gap: spacing.md, justifyContent: 'center' },
   bigBtn: { padding: spacing.lg, borderRadius: 16, minWidth: 120, alignItems: 'center' },
   yes: { backgroundColor: colors.successLight, borderWidth: 2, borderColor: colors.success },
-  no: { backgroundColor: '#FFE8E8', borderWidth: 2, borderColor: '#E74C3C' },
-  bigBtnText: { ...typography.button, color: colors.text },
+  no: { backgroundColor: '#3a2030', borderWidth: 2, borderColor: '#E74C3C' },
+  bigBtnText: { ...typography.button, color: colors.text, fontWeight: '800' },
 });

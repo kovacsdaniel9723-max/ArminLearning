@@ -7,6 +7,7 @@ import { recordIncorrectAnswer, recordGamePlayed } from '../utils/stats';
 import { recordCorrectAnswerAndCheckLevelUp, markLevelRewardSeen } from '../rewards/RewardLogic';
 import type { Reward } from '../rewards/rewards';
 import { pickMovementChallenge } from '../content/grade2/testnevData';
+import { primeCelebrationAudio } from '../utils/celebrationSound';
 
 export interface GameSessionOptions {
   roundSeconds?: number;
@@ -14,6 +15,8 @@ export interface GameSessionOptions {
   movementEvery?: number;
   /** Mozgásos szünet bekapcsolva */
   movementEnabled?: boolean;
+  /** Idő lejártakor (új kör / reset callback) */
+  onRoundTimeout?: () => void;
 }
 
 export function useGameSession(options: GameSessionOptions = {}) {
@@ -34,6 +37,9 @@ export function useGameSession(options: GameSessionOptions = {}) {
   const [movementChallenge, setMovementChallenge] = useState(pickMovementChallenge());
   const correctSinceMovement = useRef(0);
   const timerActive = useRef(true);
+  const timeoutHandled = useRef(false);
+  const onRoundTimeoutRef = useRef(options.onRoundTimeout);
+  onRoundTimeoutRef.current = options.onRoundTimeout;
 
   useEffect(() => {
     recordGamePlayed();
@@ -45,7 +51,7 @@ export function useGameSession(options: GameSessionOptions = {}) {
   }, [roundSeconds]);
 
   useEffect(() => {
-    if (!timerActive.current || isProcessing || showMovement) return;
+    if (!timerActive.current || isProcessing || showMovement || showLevelUp) return;
     if (timeLeft <= 0) return;
     const id = setInterval(() => {
       setTimeLeft((t) => {
@@ -57,12 +63,13 @@ export function useGameSession(options: GameSessionOptions = {}) {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [timeLeft, isProcessing, showMovement]);
+  }, [timeLeft, isProcessing, showMovement, showLevelUp]);
 
   const closeLevelUp = useCallback(() => {
     markLevelRewardSeen(levelUpLevel);
     setShowLevelUp(false);
-  }, [levelUpLevel]);
+    resetTimer();
+  }, [levelUpLevel, resetTimer]);
 
   const showSuccess = useCallback((msg = 'ügyes vagy! 🎉') => {
     setFeedbackMessage(msg);
@@ -92,6 +99,7 @@ export function useGameSession(options: GameSessionOptions = {}) {
   }, [movementEnabled, movementEvery]);
 
   const handleCorrect = useCallback(async (onAfter?: () => void) => {
+    primeCelebrationAudio();
     setIsProcessing(true);
     setStreak((s) => s + 1);
     showSuccess();
@@ -125,6 +133,16 @@ export function useGameSession(options: GameSessionOptions = {}) {
       onAfter?.();
     }, 1200);
   }, [showRetry, hideFeedback, resetTimer]);
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      timeoutHandled.current = false;
+      return;
+    }
+    if (timeoutHandled.current || showMovement || showLevelUp || isProcessing) return;
+    timeoutHandled.current = true;
+    void handleWrong(onRoundTimeoutRef.current);
+  }, [timeLeft, isProcessing, showMovement, showLevelUp, handleWrong]);
 
   const handleTimeout = useCallback(async (onAfter?: () => void) => {
     if (isProcessing) return;

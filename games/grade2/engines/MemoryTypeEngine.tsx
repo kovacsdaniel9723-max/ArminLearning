@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, spacing, typography } from '../../../theme';
+import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
 
@@ -59,14 +60,14 @@ export const MemoryTypeEngine: React.FC = () => {
       onMovementSkip={() => session.skipMovement(reset)}
     >
       <Text style={styles.hint}>milyen mondatfajta ez?</Text>
-      <View style={styles.card}>
-        <Text style={styles.cardText}>{round.sentence.text}</Text>
+      <View style={g2.infoPanel}>
+        <Text style={g2.infoPanelText}>{round.sentence.text}</Text>
       </View>
       <View style={styles.grid}>
         {round.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
+          <TouchableOpacity key={i} style={g2.optionCompact} onPress={() => onPick(i)} disabled={session.isProcessing}>
             <Text style={styles.typeEmoji}>{opt.emoji}</Text>
-            <Text style={styles.optionText}>{opt.type}</Text>
+            <Text style={g2.optionLabel}>{opt.type}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -76,25 +77,6 @@ export const MemoryTypeEngine: React.FC = () => {
 
 const styles = StyleSheet.create({
   hint: { textAlign: 'center', ...typography.body, color: colors.textLight, marginBottom: spacing.md },
-  card: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    borderRadius: 16,
-    borderWidth: 3,
-    borderColor: colors.primaryLight,
-    marginBottom: spacing.lg,
-  },
-  cardText: { ...typography.h3, textAlign: 'center', color: colors.text },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
-  option: {
-    backgroundColor: colors.accentLight,
-    padding: spacing.md,
-    borderRadius: 12,
-    minWidth: '28%',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.accent,
-  },
   typeEmoji: { fontSize: 28 },
-  optionText: { ...typography.bodySmall, fontWeight: '700', marginTop: spacing.xs },
 });

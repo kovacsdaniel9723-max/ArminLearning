@@ -19,3 +19,24 @@ export function useRoundOptions<T>(
 ): { options: T[]; correctIdx: number } {
   return useMemo(build, [roundKey]);
 }
+
+/** Egyedi numerikus válaszopciók (min. count darab, helyes érték benne) */
+export function buildUniqueNumberOptions(
+  correct: number,
+  count = 4,
+  candidates: number[] = [],
+): { options: number[]; correctIdx: number } {
+  const opts = new Set<number>([correct]);
+  for (const v of candidates) {
+    if (v > 0 && v !== correct) opts.add(v);
+    if (opts.size >= count) break;
+  }
+  let delta = 1;
+  while (opts.size < count && delta < 50) {
+    if (correct + delta > 0) opts.add(correct + delta);
+    if (opts.size < count && correct - delta > 0) opts.add(correct - delta);
+    delta++;
+  }
+  const options = shuffleArray([...opts].slice(0, count));
+  return { options, correctIdx: options.indexOf(correct) };
+}

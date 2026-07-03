@@ -17,7 +17,7 @@ export const MOVEMENT_CHALLENGES: MovementChallenge[] = [
   { id: 'stretch', text: 'nyújtózz fel magasra!', seconds: 10, emoji: '🙆' },
   { id: 'march', text: 'menetelj a helyeden 10 lépést!', seconds: 12, emoji: '🚶' },
   { id: 'squat5', text: 'guggolj le 5-ször!', seconds: 15, emoji: '🏋️' },
-  { id: 'wave', text: 'integetj mindkét kezeddel!', seconds: 8, emoji: '👋' },
+  { id: 'wave', text: 'integets mindkét kezeddel!', seconds: 8, emoji: '👋' },
 ];
 
 export const COORDINATION_PATTERNS: { id: string; steps: string[]; emoji: string[] }[] = [

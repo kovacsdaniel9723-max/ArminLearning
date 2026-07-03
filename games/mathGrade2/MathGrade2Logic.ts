@@ -25,14 +25,14 @@ export function generateMathGrade2Task(): MathGrade2Task {
   const op = pickOp();
 
   if (op === 'add') {
-    const a = 15 + Math.floor(Math.random() * 50);
-    const b = 5 + Math.floor(Math.random() * Math.min(40, 100 - a));
+    const a = 10 + Math.floor(Math.random() * 26);
+    const b = 2 + Math.floor(Math.random() * Math.min(12, 40 - a));
     return { op, a, b, answer: a + b };
   }
 
   if (op === 'subtract') {
-    const a = 25 + Math.floor(Math.random() * 75);
-    const b = 5 + Math.floor(Math.random() * Math.min(20, a - 10));
+    const a = 12 + Math.floor(Math.random() * 28);
+    const b = 2 + Math.floor(Math.random() * Math.min(10, a - 8));
     return { op, a, b, answer: a - b };
   }
 
@@ -89,9 +89,9 @@ export function getQuestionText(task: MathGrade2Task): string {
     case 'subtract':
       return 'hány alma marad?';
     case 'multiply':
-      return `hány alma van ${task.b} csoportban?`;
+      return `${task.b} csoport, mindegyikben ${task.perGroup} alma. hány alma van összesen?`;
     case 'divide':
-      return 'hány csoport alma van?';
+      return `${task.a} alma van. csoportonként ${task.perGroup} alma. hány csoport lesz?`;
     default:
       return 'mennyi az eredmény?';
   }

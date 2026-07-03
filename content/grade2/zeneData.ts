@@ -72,9 +72,9 @@ export interface DanceMove {
 }
 
 export const DANCE_SEQUENCES: DanceMove[] = [
-  { moves: ['emeld fel a kezed', 'forgass csípőt', ' tapsolj'], emojis: ['🙌', '💃', '👏'] },
-  { moves: ['lépj jobbra', 'lépj balra', ' ugorj'], emojis: ['➡️', '⬅️', '⬆️'] },
-  { moves: ['bólints', ' integetj', ' pacsizd be magad'], emojis: ['🙂', '👋', '🤝'] },
+  { moves: ['emeld fel a kezed', 'forgass csípőt', 'tapsolj'], emojis: ['🙌', '💃', '👏'] },
+  { moves: ['lépj jobbra', 'lépj balra', 'ugorj'], emojis: ['➡️', '⬅️', '⬆️'] },
+  { moves: ['bólints', 'integets', 'pacsizd be magad'], emojis: ['🙂', '👋', '🤝'] },
 ];
 
 export function pickDanceSequence(): DanceMove {

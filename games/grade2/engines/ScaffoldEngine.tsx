@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors, spacing, typography } from '../../../theme';
+import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
 import { pickScaffold } from '../../../content/grade2/magyarData';
@@ -32,7 +33,6 @@ export const ScaffoldEngine: React.FC = () => {
         await session.handleCorrect(reset);
       } else {
         setSlotIdx(slotIdx + 1);
-        await session.handleCorrect();
       }
     } else {
       await session.handleWrong();
@@ -57,7 +57,7 @@ export const ScaffoldEngine: React.FC = () => {
       onMovementSkip={() => session.skipMovement(reset)}
     >
       <Text style={styles.theme}>téma: {scaffold.theme}</Text>
-      <View style={styles.built}>
+      <View style={g2.infoPanel}>
         {built.map((s, i) => (
           <Text key={i} style={styles.builtLine}>{s}</Text>
         ))}
@@ -66,8 +66,8 @@ export const ScaffoldEngine: React.FC = () => {
       {slot ? (
         <View style={styles.options}>
           {slot.options.map((opt, i) => (
-            <TouchableOpacity key={i} style={styles.opt} onPress={() => onPick(i)} disabled={session.isProcessing}>
-              <Text style={styles.optText}>{opt}</Text>
+            <TouchableOpacity key={i} style={g2.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
+              <Text style={g2.optionTextBody}>{opt}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -78,16 +78,7 @@ export const ScaffoldEngine: React.FC = () => {
 
 const styles = StyleSheet.create({
   theme: { ...typography.body, textAlign: 'center', color: colors.primary, marginBottom: spacing.md },
-  built: { backgroundColor: colors.white, padding: spacing.md, borderRadius: 12, marginBottom: spacing.lg, minHeight: 80 },
   builtLine: { ...typography.body, color: colors.text, marginBottom: spacing.xs },
-  prompt: { ...typography.h3, color: colors.accentDark, marginTop: spacing.sm },
+  prompt: { ...typography.h3, color: colors.accent, marginTop: spacing.sm, textAlign: 'center' },
   options: { gap: spacing.sm },
-  opt: {
-    backgroundColor: colors.cardBackground,
-    padding: spacing.md,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
-  },
-  optText: { ...typography.body, textAlign: 'center' },
 });

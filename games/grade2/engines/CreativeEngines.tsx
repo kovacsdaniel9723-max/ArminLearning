@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import Svg, { Circle, Rect, Polygon } from 'react-native-svg';
 import * as Speech from 'expo-speech';
 import { colors, spacing, typography } from '../../../theme';
+import { grade2GameStyles as g2 } from '../../../theme/grade2GameStyles';
 import { useGameSession } from '../../../hooks/useGameSession';
 import { GameSessionLayout } from '../../../components/game/GameSessionLayout';
 import { pickRhythmPattern, pickSoundTask, pickDanceSequence } from '../../../content/grade2/zeneData';
@@ -26,7 +27,7 @@ export const PunctuationEngine: React.FC = () => (
       const t = pickPunctuationTask();
       return {
         prompt: t.sentence.replace('___', ' ___ '),
-        subtitle: 'mi hiányzik?',
+        subtitle: 'melyik mondatvégi írásjel hiányzik?',
         options: t.options.map((o) => ({ label: o })),
         correct: t.correct,
       };
@@ -123,9 +124,9 @@ export const SoundPickEngine: React.FC = () => {
       </TouchableOpacity>
       <View style={styles.grid}>
         {task.options.map((opt, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
+          <TouchableOpacity key={i} style={g2.optionCompact} onPress={() => onPick(i)} disabled={session.isProcessing}>
             <Text style={styles.emoji}>{opt.emoji}</Text>
-            <Text style={styles.label}>{opt.label}</Text>
+            <Text style={g2.optionLabel}>{opt.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -135,7 +136,7 @@ export const SoundPickEngine: React.FC = () => {
 
 export const DanceEngine: React.FC = () => {
   const session = useGameSession({ roundSeconds: 60 });
-  const [seq] = useState(() => pickDanceSequence());
+  const [seq, setSeq] = useState(() => pickDanceSequence());
   const [shown, setShown] = useState(0);
 
   useEffect(() => {
@@ -146,7 +147,10 @@ export const DanceEngine: React.FC = () => {
 
   const onDone = async () => {
     if (session.isProcessing || shown < seq.moves.length) return;
-    await session.handleCorrect(() => setShown(0));
+    await session.handleCorrect(() => {
+      setShown(0);
+      setSeq(pickDanceSequence());
+    });
   };
 
   return (
@@ -270,9 +274,9 @@ export const NetSafetyEngine: React.FC = () => {
       <Text style={styles.story}>{step.text}</Text>
       <View style={styles.grid}>
         {step.choices.map((c, i) => (
-          <TouchableOpacity key={i} style={styles.option} onPress={() => onPick(i)} disabled={session.isProcessing}>
+          <TouchableOpacity key={i} style={g2.optionCompact} onPress={() => onPick(i)} disabled={session.isProcessing}>
             <Text style={styles.emoji}>{c.emoji}</Text>
-            <Text style={styles.label}>{c.label}</Text>
+            <Text style={g2.optionLabel}>{c.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -396,21 +400,19 @@ const styles = StyleSheet.create({
   tapBtn: { backgroundColor: colors.primary, padding: spacing.xl, borderRadius: 80, alignSelf: 'center' },
   tapText: { ...typography.buttonLarge, color: colors.white },
   playBtn: { backgroundColor: colors.accentLight, padding: spacing.md, borderRadius: 12, marginBottom: spacing.md, alignItems: 'center' },
-  playText: { ...typography.body, fontWeight: '600' },
+  playText: { ...typography.body, fontWeight: '700', color: colors.text },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
-  option: { backgroundColor: colors.white, padding: spacing.md, borderRadius: 12, minWidth: '30%', alignItems: 'center', borderWidth: 2, borderColor: colors.primaryLight },
   emoji: { fontSize: 36 },
-  label: { ...typography.bodySmall, fontWeight: '600', marginTop: spacing.xs, textAlign: 'center' },
-  moveRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm, padding: spacing.sm, backgroundColor: colors.white, borderRadius: 12 },
+  moveRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm, padding: spacing.sm, backgroundColor: colors.cardBackground, borderRadius: 12, borderWidth: 2, borderColor: colors.cardBorder },
   moveEmoji: { fontSize: 32 },
-  moveText: { ...typography.body, flex: 1 },
-  step: { ...typography.bodyLarge, marginBottom: spacing.sm, padding: spacing.sm, backgroundColor: colors.accentLight, borderRadius: 8 },
+  moveText: { ...typography.body, flex: 1, color: colors.text },
+  step: { ...typography.bodyLarge, marginBottom: spacing.sm, padding: spacing.sm, backgroundColor: colors.backgroundLight, borderRadius: 8, color: colors.text, borderWidth: 1, borderColor: colors.cardBorder },
   doneBtn: { backgroundColor: colors.secondary, padding: spacing.md, borderRadius: 16, marginTop: spacing.lg, alignItems: 'center' },
   doneText: { ...typography.button, color: colors.white },
   arena: { flex: 1, minHeight: 280, backgroundColor: colors.backgroundDark, borderRadius: 16, position: 'relative' },
   target: { position: 'absolute', padding: spacing.md },
   targetText: { fontSize: 48 },
-  story: { ...typography.bodyLarge, textAlign: 'center', marginBottom: spacing.lg, padding: spacing.md, backgroundColor: colors.white, borderRadius: 12 },
+  story: { ...typography.bodyLarge, textAlign: 'center', marginBottom: spacing.lg, padding: spacing.md, backgroundColor: colors.backgroundLight, borderRadius: 12, color: colors.text, borderWidth: 2, borderColor: colors.cardBorder },
   colors: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.sm, justifyContent: 'center' },
   colorDot: { width: 36, height: 36, borderRadius: 18, borderColor: colors.text },
   canvas: { height: 280, backgroundColor: colors.white, borderRadius: 16, borderWidth: 2, borderColor: colors.grayLight, overflow: 'hidden', marginBottom: spacing.sm },

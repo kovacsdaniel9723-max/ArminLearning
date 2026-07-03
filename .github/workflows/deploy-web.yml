@@ -5,17 +5,22 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-# A repo Settings → Pages → Source legyen: GitHub Actions
+# Settings → Pages → Source: GitHub Actions
+# Settings → Environments → github-pages: ne legyen kötelező jóváhagyás
 permissions:
   contents: read
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -34,6 +39,8 @@ jobs:
         run: |
           cp dist/index.html dist/404.html
           touch dist/.nojekyll
+          ls -la dist
+          du -sh dist
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -45,14 +52,80 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy1.outputs.page_url }}
     permissions:
+      contents: read
       pages: write
       id-token: write
+      actions: read
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - name: Deploy to GitHub Pages (attempt 1)
+        id: deploy1
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Wait before retry
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 45
+
+      - name: Deploy to GitHub Pages (attempt 2)
+        id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Wait before retry
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 45
+
+      - name: Deploy to GitHub Pages (attempt 3)
+        id: deploy3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
         uses: actions/deploy-pages@v4
 
+      - name: Verify deployment
+        if: always()
+        run: |
+          if [ "${{ steps.deploy1.outcome }}" = "success" ] || [ "${{ steps.deploy2.outcome }}" = "success" ] || [ "${{ steps.deploy3.outcome }}" = "success" ]; then
+            echo "Deploy succeeded"
+          else
+            echo "All deploy attempts failed"
+            exit 1
+          fi
+
       - name: Site URL
+        if: success()
         run: echo "Published at https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+
+  fallback:
+    needs: [build, deploy]
+    if: failure() && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx expo export -p web
+      - run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+
+      - name: Push to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean: true
+          single-commit: true
+
+      - name: Fallback note
+        run: |
+          echo "::warning::Artifact deploy failed – pushed to gh-pages branch."
+          echo "If the site is still stale, set Settings → Pages → Source to branch gh-pages / (root)."
